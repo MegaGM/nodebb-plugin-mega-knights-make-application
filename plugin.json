@@ -1,0 +1,18 @@
+{
+	"id": "nodebb-plugin-mega-knights-make-application",
+	"name": "Make application page for Knights",
+	"library": "./library.js",
+	"scripts": [
+		"client/js/client.js"
+	],
+	"less": ["client/less/styles.less"],
+	"templates": "templates",
+	"staticDirs": {
+		"js": "client/js",
+		"img": "client/img"
+	},
+	"hooks": [{
+		"hook": "static:app.load",
+		"method": "init"
+	}]
+}

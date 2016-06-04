@@ -1,1 +1,1 @@
-# nodebb-plugin-mega-knights-make-application
+## This plugin is NOT production ready
