@@ -304,12 +304,13 @@
 		<label for="character-apb-screenshot-placeholder-{characterApbIndex}">Статистика персонажа (J в игре)</label>
 		<br>
 		<div class="character-apb-screenshot-placeholder" id="character-apb-screenshot-placeholder-{characterApbIndex}" data-character-index="{characterApbIndex}">
+			<!-- <img class="image character-apb-screenshot-stats-thumbnail img-responsive" src="https://i.imgur.com/1M6lK15.jpg" alt=""> -->
 			<i class="icon fa fa-cloud-upload fa-3x"></i>
 		</div>
 	</div>
 
 	<!-- /api/post/upload -->
-	<form method="post" enctype="multipart/form-data" action="/api/post/upload" class="character-apb-screenshot-stats-form" id="character-apb-screenshot-stats-form-{characterApbIndex}">
+	<form method="post" enctype="multipart/form-data" action="/api/post/upload" data-character-index="{characterApbIndex}" class="character-apb-screenshot-stats-form" id="character-apb-screenshot-stats-form-{characterApbIndex}">
 		<input type="file" class="character-apb-screenshot-stats-input" name="files[]" id="character-apb-screenshot-stats-input-{characterApbIndex}">
 	</form>
 

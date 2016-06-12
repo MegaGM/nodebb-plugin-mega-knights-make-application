@@ -63,14 +63,23 @@
 	}
 
 	.character-apb-screenshot-placeholder {
-		display     : inline-block;
-		width       : 250px;
-		height      : 140px;
-		border      : 2px dashed #dedede;
-		border-color: #bce8f1;
+		display        : inline-block;
+		width          : 250px;
+		height         : 140px;
+		border         : 2px dashed #dedede;
+		border-color   : #bce8f1;
+		background-size: cover;
 
 		&:hover {
 			background-color: rgba(228, 247, 255, 0.5);
+		}
+
+		&.no-border {
+			border: none;
+		}
+
+		.image {
+			display: none;
 		}
 
 		.icon {

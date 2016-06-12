@@ -3,7 +3,10 @@
 	"name": "Make application page for Knights",
 	"library": "./library.js",
 	"scripts": [
-		"client/js/client.js"
+		"client/js/control-flow.js",
+		"client/js/local-storage.js",
+		"client/js/characters.js",
+		"client/js/screenshots.js"
 	],
 	"less": ["client/less/styles.less"],
 	"templates": "templates",
