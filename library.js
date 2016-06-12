@@ -18,20 +18,27 @@
 	 * declare routes
 	 * ---------------------------------------------*/
 	var render = {
+		testing: function (req, res, next) {
+			console.log('testing route req.files', req.files);
+			console.log('testing route req', req);
+			res.status(200).json({okay: 'fine'});
+		},
 		application: function (req, res, next) {
 			application.getApplicationPage(req, res, function (err, data) {
-				console.log('getApplicationPage data: ', data);
+				// console.log('getApplicationPage data: ', data);
 				res.render('application', data);
 			});
-			console.log('application middleware!!');
+			// console.log('application middleware!!');
 			if (res.locals.isAPI) {
-				console.log('application middleware isAPI!!!');
+				// console.log('application middleware isAPI!!!');
 			}
 		}
 	};
 
 	var Plugin = {
 		init: function (params, callback) {
+			params.router.post('/api/testing',
+				render.testing);
 			/* ---------------------------------------------
 			 * setup routes
 			 * ---------------------------------------------*/

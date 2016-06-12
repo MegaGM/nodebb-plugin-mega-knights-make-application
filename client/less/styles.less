@@ -8,6 +8,80 @@
 	background: #fff;
 }
 
-.welcome-message {
-	padding: 10px;
+.application-form-layout,
+.statute-layout,
+.welcome-message-layout {
+	padding: 30px;
+
+	.header {
+		margin-top: 10px;
+	}
+
+	.form-group {
+		margin-bottom: 15px;
+	}
+
+	.apply,
+	.content {
+		padding: 15px;
+
+		.checkbox-inline {
+			margin-left: 15px;
+		}
+	}
+}
+
+.apb-related,
+.bns-related,
+.gta-related {
+	display: none;
+}
+
+.statute-layout,
+.welcome-message-layout {
+	display: none;
+}
+// .application-form-layout,
+// .statute-layout {
+// 	display: none;
+// }
+
+.character-apb {
+	.margin-left-50 {
+		margin-left: 50px;
+	}
+
+	.character-apb-screenshot-stats-form {
+		display: none;
+	}
+
+	.characters-remove-apb {
+		height        : 42px;
+		line-height   : 42px;
+		vertical-align: middle;
+		margin-right  : 15px;
+	}
+
+	.character-apb-screenshot-placeholder {
+		display     : inline-block;
+		width       : 250px;
+		height      : 140px;
+		border      : 2px dashed #dedede;
+		border-color: #bce8f1;
+
+		&:hover {
+			background-color: rgba(228, 247, 255, 0.5);
+		}
+
+		.icon {
+			display  : block;
+			position : relative;
+			margin   : 0 auto;
+			width    : 46px;
+			height   : 46px;
+			top      : 50%;
+			transform: translateY(-50%);
+			color    : #d9edf7;
+		}
+	}
 }

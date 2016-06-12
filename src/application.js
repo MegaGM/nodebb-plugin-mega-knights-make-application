@@ -7,6 +7,7 @@ var req,
 	nconf = require.main.require('nconf'),
 	db = require.main.require('./src/database/redis'),
 	middleware = require.main.require('./src/middleware'),
+	plugins = require.main.require('./src/plugins'),
 	posts = require.main.require('./src/posts'),
 	topics = require.main.require('./src/topics'),
 	templates = require.main.require('templates.js'),
@@ -25,7 +26,12 @@ var getTopicsTagsAndReadState = function (callback) {
 };
 
 var getStatute = function (callback) {
-	callback();
+	posts.getPostData(Block.data.statutePid, function (err, statuteData) {
+		if (err) return callback(err);
+		plugins.fireHook('filter:parse.raw', statuteData.content, function (err, data) {
+			callback(err, data);
+		});
+	});
 };
 
 //topics.hasReadTopics(tids, uid, callback)
@@ -35,7 +41,8 @@ Block.getApplicationPage = function (_req, _res, callback) {
 	async.parallel({
 		getStatute: getStatute
 	}, function (err, results) {
-		callback(err, {meow: 'aw'});
+		Block.data.statute = results.getStatute;
+		callback(err, Block.data);
 		// templates.parse(newsTemplate, {
 		// 	news: Block.data.topics,
 		// 	config: {
