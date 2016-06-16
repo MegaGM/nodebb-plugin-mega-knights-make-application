@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/MegaGM/nodebb-plugin-mega-knights-make-application/issues"
   },
-  "homepage": "https://github.com/MegaGM/nodebb-plugin-mega-knights-make-application#readme"
+  "homepage": "https://github.com/MegaGM/nodebb-plugin-mega-knights-make-application#readme",
+  "dependencies": {
+    "validator": "^5.4.0"
+  }
 }

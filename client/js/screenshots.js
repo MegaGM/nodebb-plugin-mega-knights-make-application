@@ -3,42 +3,40 @@ $(document).on('ready', function (e) {
 	 * characters logic
 	 * ===============================================*/
 	// on adding screenshot
-	$(document).on('click', '.character-apb-screenshot-placeholder', function (e) {
-		var el = $(e.target),
-			characterIndex = el.attr('data-character-index') || el.closest('[data-character-index]').attr('data-character-index');
-		$('#character-apb-screenshot-stats-input-' + characterIndex).trigger('click');
+	$(document).on('click', '.screenshot-placeholder', function (e) {
+		var el = $(e.target);
+		el.find('.screenshot-fileinput').trigger('click');
 	});
 
 	// on uploading screenshot
 	require(['csrf'], function (csrf) {
-		$(document).on('change', '.character-apb-screenshot-stats-input', function (e) {
+		$(document).on('change', '.screenshot-fileinput', function (e) {
 			var el = $(e.target),
 				form = el.closest('form'),
-				characterIndex = form.attr('data-character-index');
+				placeholder = el.closest('.screenshot-placeholder'),
+				characterIndex = el.closest('.char').attr('data-char-index');
 
-			var files = (el.get(0).files.length > 0 && el.get(0).files) || (el.val() ? [{
-				name: el.val(),
-				type: utils.fileMimeType(el.val())
-			}] : null);
-			console.log('characterIndex', characterIndex);
-			console.log('form', form);
-			console.log('files', files);
+			var files = (el.get(0).files.length > 0 && el.get(0).files) ||
+				(el.val() ? [{
+					name: el.val(),
+					type: utils.fileMimeType(el.val())
+				}] : null);
 
 			if (!files || !files.length) {
-				var placeholder = $('#character-apb-screenshot-placeholder-' + characterIndex);
-				placeholder.css('background-image', 'none');
-				placeholder.removeClass('no-border');
+				placeholder
+					.css('background-image', 'none')
+					.removeClass('no-border');
 				placeholder.find('.icon').show();
+				placeholder.find('.screenshot-url').val('');
+				return false;
 			}
 
 			var image = el.get(0).files[0],
 				isImage = !!image.type.match(/image./);
-			console.log('input changed, files: ', files);
-			console.log('isImage and image', isImage, image);
 
 			if (!isImage) {
 				form.get(0).reset();
-				return app.alertError('[[error:invalid-file-type, jpg png gif bmp]]');
+				return app.alertError('[[error:invalid-file-type, .jpg, .png, .gif, .bmp]]')
 			}
 
 			if (image.size > parseInt(config.maximumFileSize, 10) * 1024) {
@@ -47,35 +45,43 @@ $(document).on('ready', function (e) {
 			}
 
 			form.off('submit').submit(function () {
+				// setup spinner to indicate upload progress
+				placeholder.find('.icon')
+					.removeClass('fa-cloud-upload')
+					.addClass('fa-spinner fa-spin');
+
 				$(this).ajaxSubmit({
 					headers: {
 						'x-csrf-token': csrf.get()
 					},
-					resetForm: true,
-					clearForm: true,
-					// formData: params.formData,
 					error: onUploadError,
-					uploadProgress: function (event, position, total, percent) {
-						translator.translate('[[modules:composer.uploading, ' + percent + '%]]', function (translated) {
-							for (var i = 0; i < files.length; ++i) {
-								console.log(translated);
-							}
-						});
-					},
 					success: function (uploads) {
 						uploads = maybeParse(uploads);
+						// may cause silent errors
 						if (!uploads || !uploads.length) return;
 						uploads.forEach(function (image) {
-							var placeholder = $('#character-apb-screenshot-placeholder-' + characterIndex);
-							placeholder.css('background-image', 'url(' + image.url + ')');
-							placeholder.addClass('no-border');
-							placeholder.find('.icon').hide();
-							console.log('an image', image);
+							placeholder
+								.css('background-image', 'url(' + image.url + ')')
+								.addClass('no-border');
+							placeholder.find('.icon').hide()
+							placeholder.find('.screenshot-url').val(image.url);
 						});
 					},
 					complete: function () {
-						form.get(0).reset();
+						placeholder.find('.icon')
+							.removeClass('fa-spinner fa-spin')
+							.addClass('fa-cloud-upload');
 					}
+					// resetForm: true
+					// clearForm: true
+					// formData: params.formData
+					// uploadProgress: function (event, position, total, percent) {
+					// 	translator.translate('[[modules:composer.uploading, ' + percent + '%]]', function (translated) {
+					// 		for (var i = 0; i < files.length; ++i) {
+					// 			console.log(translated);
+					// 		}
+					// 	});
+					// }
 				});
 				return false;
 			});

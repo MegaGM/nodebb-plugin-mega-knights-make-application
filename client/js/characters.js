@@ -1,20 +1,22 @@
-var characterApbIndex = 0;
+var charI = 0;
 $(document).on('ready', function (e) {
 	/* ================================================
 	 * characters logic
 	 * ===============================================*/
 	// on adding character
-	$(document).on('click', '.characters-apb .characters-add-apb', function (e) {
-		app.parseAndTranslate('partials/apb-character', {
-			characterApbIndex: ++characterApbIndex
+	$(document).on('click', '.charlist-add', function (e) {
+		var el = $(e.target),
+			game = el.closest('[data-game]').attr('data-game');
+		app.parseAndTranslate('partials/' + game + '-character', {
+			charI: ++charI
 		}, function (html) {
-			$('.characters-apb .characters').append(html);
+			el.closest('[data-game]').find('.charlist').append(html);
 		});
 	});
 
 	// on removing character
-	$(document).on('click', '.characters-apb .characters-remove-apb', function (e) {
+	$(document).on('click', '.charlist-remove', function (e) {
 		var el = $(e.target);
-		$('#character-apb-' + el.attr('data-character-index')).remove();
+		el.closest('.char').remove();
 	});
 });

@@ -1,36 +1,41 @@
-<div class="character character-apb" id="character-apb-{characterApbIndex}">
+<div id="apb-char-{charI}" class="char apb-char" data-char-index="{charI}">
 	<div class="form-inline">
-		<i class="characters-remove-apb fa fa-user-times text-danger fa-2x" data-character-index="{characterApbIndex}"></i>
+		<i class="charlist-remove fa fa-user-times text-danger fa-2x"></i>
 
 		<div class="form-group">
-			<label for="character-apb-nickname-{characterApbIndex}">Никнейм</label>
+			<label for="apb-char-{charI}-nickname">Никнейм</label>
 			<br>
-			<input id="character-apb-nickname-{characterApbIndex}" type="text" class="form-control" placeholder="Nickname">
+			<input id="apb-char-{charI}-nickname" class="form-control" type="text" placeholder="Nickname">
 		</div>
 
 		<div class="form-group">
-			<label for="character-apb-server-{characterApbIndex}">Сервер</label>
+			<label for="apb-char-{charI}-server">Сервер</label>
 			<br>
-			<select id="character-apb-server-{characterApbIndex}" class="form-control">
-				<option value="citadel" selected="selected">Citadel</option>
+			<select id="apb-char-{charI}-server" class="form-control">
+				<option value="not-selected" selected="selected">...</option>
+				<option value="citadel">Citadel</option>
+				<option value="pioneer">Jericho</option>
+				<option value="pioneer">Han</option>
 				<option value="pioneer">Pioneer</option>
 			</select>
 		</div>
 
 		<div class="form-group">
-			<label for="character-apb-faction-{characterApbIndex}">Фракция</label>
+			<label for="apb-char-{charI}-faction">Фракция</label>
 			<br>
-			<select id="character-apb-faction-{characterApbIndex}" class="form-control">
-				<option value="enforcer" selected="selected">Enforcer</option>
+			<select id="apb-char-{charI}-faction" class="form-control">
+				<option value="not-selected" selected="selected">...</option>
 				<option value="criminal">Criminal</option>
+				<option value="enforcer">Enforcer</option>
 			</select>
 		</div>
 
 		<div class="form-group">
-			<label for="character-apb-threat-{characterApbIndex}">Угроза</label>
+			<label for="apb-char-{charI}-threat">Угроза</label>
 			<br>
-			<select id="character-apb-threat-{characterApbIndex}" class="form-control">
-				<option value="green" selected="selected">Green</option>
+			<select id="apb-char-{charI}-threat" class="form-control">
+				<option value="not-selected" selected="selected">...</option>
+				<option value="green">Green</option>
 				<option value="bronze">Bronze</option>
 				<option value="silver">Silver</option>
 				<option value="gold">Gold</option>
@@ -38,10 +43,11 @@
 		</div>
 
 		<div class="form-group">
-			<label for="character-apb-level-{characterApbIndex}">Уровень</label>
+			<label for="apb-char-{charI}-level">Уровень</label>
 			<br>
-			<select id="character-apb-level-{characterApbIndex}" class="form-control">
-				<option value="1" selected="selected">1</option>
+			<select id="apb-char-{charI}-level" class="apb-char-level form-control">
+				<option value="not-selected" selected="selected">...</option>
+				<option value="1">1</option>
 				<option value="2">2</option>
 				<option value="3">3</option>
 				<option value="4">4</option>
@@ -301,17 +307,17 @@
 	</div>
 
 	<div class="form-group margin-left-50">
-		<label for="character-apb-screenshot-placeholder-{characterApbIndex}">Статистика персонажа (J в игре)</label>
+		<label for="apb-char-{charI}-screenshot-url-charstats">Скриншот статистики персонажа</label>
 		<br>
-		<div class="character-apb-screenshot-placeholder" id="character-apb-screenshot-placeholder-{characterApbIndex}" data-character-index="{characterApbIndex}">
-			<!-- <img class="image character-apb-screenshot-stats-thumbnail img-responsive" src="https://i.imgur.com/1M6lK15.jpg" alt=""> -->
+		<div class="screenshot-placeholder">
 			<i class="icon fa fa-cloud-upload fa-3x"></i>
+			<input id="apb-char-{charI}-screenshot-url-charstats" class="screenshot-url" type="text"></input>
+
+			<form class="screenshot-form" action="/api/post/upload" method="post" enctype="multipart/form-data">
+				<input class="screenshot-fileinput" type="file" name="files[]">
+			</form>
 		</div>
 	</div>
 
-	<!-- /api/post/upload -->
-	<form method="post" enctype="multipart/form-data" action="/api/post/upload" data-character-index="{characterApbIndex}" class="character-apb-screenshot-stats-form" id="character-apb-screenshot-stats-form-{characterApbIndex}">
-		<input type="file" class="character-apb-screenshot-stats-input" name="files[]" id="character-apb-screenshot-stats-input-{characterApbIndex}">
-	</form>
-
+	<hr />
 </div>

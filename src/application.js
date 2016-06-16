@@ -11,46 +11,46 @@ var req,
 	posts = require.main.require('./src/posts'),
 	topics = require.main.require('./src/topics'),
 	templates = require.main.require('templates.js'),
-	privileges = require.main.require('./src/privileges');
+	privileges = require.main.require('./src/privileges'),
+	nbbHelpers = require.main.require('./src/controllers/helpers'),
+	data = {
+		title: 'Создать заявку',
+		breadcrumbs: nbbHelpers.buildBreadcrumbs([{}])
+	},
+	validation = require('../client/js/validation.js');
 // newsTemplate = fs.readFileSync(path.join(__dirname, '../templates/partials/news.tpl')).toString();
 
 var Block = {
 	data: {
-		statutePid: '2',
-		topicTags: []
+		statutePid: '2'
 	}
 };
 
-var getTopicsTagsAndReadState = function (callback) {
-	//meow
-};
-
 var getStatute = function (callback) {
-	posts.getPostData(Block.data.statutePid, function (err, statuteData) {
+	posts.getPostData(Block.data.statutePid, function (err, statuteRaw) {
 		if (err) return callback(err);
-		plugins.fireHook('filter:parse.raw', statuteData.content, function (err, data) {
-			callback(err, data);
+
+		plugins.fireHook('filter:parse.raw', statuteRaw.content, function (err, statuteParsed) {
+			callback(err, statuteParsed);
 		});
 	});
 };
 
-//topics.hasReadTopics(tids, uid, callback)
-Block.getApplicationPage = function (_req, _res, callback) {
-	req = _req;
-	res = _res;
-	async.parallel({
-		getStatute: getStatute
-	}, function (err, results) {
-		Block.data.statute = results.getStatute;
-		callback(err, Block.data);
-		// templates.parse(newsTemplate, {
-		// 	news: Block.data.topics,
-		// 	config: {
-		// 		relative_path: nconf.get('relative_path')
-		// 	}
-		// }, function (html) {
-		// 	callback(err, html);
-		// });
+Block.getApplicationPage = function (req, res, next) {
+	getStatute(function (err, results) {
+		if (err) return next(err);
+
+		Block.data.statute = results.statute;
+		res.render('make-application', Block.data);
+	});
+};
+
+Block.postApplicationPage = function (req, res, next) {
+	return res.status(200).json({
+		template: {
+			name: 'make-application',
+			'make-application': true
+		}
 	});
 };
 

@@ -13,28 +13,28 @@ $(document).on('ready', function (e) {
 			var data = store.getAll();
 			Object.keys(data).forEach(function (key, i) {
 				if (0 !== key.indexOf(storagePrefix)) return;
+
 				var el = $('#' + key.replace(storagePrefix, ''));
 				if (1 !== el.length) return;
 
-				'checkbox' === el.attr('type') ?
-					el.attr('checked', data[key]) :
+				if ('checkbox' === el.prop('type'))
+					el.prop('checked', data[key]).trigger('change');
+				else
 					el.val(data[key]);
 			});
 		}
 
 		$(document).on('change', '.application-form-layout input, .application-form-layout select, .application-form-layout textarea', function (e) {
 			var el = $(e.target);
-			if (el.closest('.character').length > 0) return;
-			if ('file' === el.attr('type')) return;
+			// don't even try to save fileinputs
+			if ('file' === el.prop('type')) return;
+			// don't save characters, because they're created dynamically
+			if (el.closest('.char').length > 0) return;
 
-			if ('checkbox' === el.attr('type')) {
-				// don't save state if it's choose-game checkbox
-				if (el.closest('.choose-game').length > 0) return;
-
-				store.set(storagePrefix + el.attr('id'), el.is(':checked'));
-			} else {
-				store.set(storagePrefix + el.attr('id'), el.val());
-			}
+			if ('checkbox' === el.prop('type'))
+				store.set(storagePrefix + el.prop('id'), el.prop('checked'));
+			else
+				store.set(storagePrefix + el.prop('id'), el.val());
 		});
 
 		// setup
