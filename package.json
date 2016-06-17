@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/MegaGM/nodebb-plugin-mega-knights-make-application#readme",
   "dependencies": {
+    "jsonwebtoken": "^7.0.1",
     "validator": "^5.4.0"
   }
 }

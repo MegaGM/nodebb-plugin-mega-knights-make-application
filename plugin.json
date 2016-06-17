@@ -17,5 +17,11 @@
 	"hooks": [{
 		"hook": "static:app.load",
 		"method": "init"
+	}, {
+		"hook": "filter:topic.post",
+		"method": "revertUID"
+	}, {
+		"hook": "filter:parse.post",
+		"method": "parseApplication"
 	}]
 }

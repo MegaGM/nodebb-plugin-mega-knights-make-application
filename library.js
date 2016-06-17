@@ -15,21 +15,30 @@
 		init: function (params, callback) {
 			// get
 			params.router.get('/make-application',
-				ensureLoggedIn.ensureLoggedIn(nconf.get('relative_path') + '/login'),
+				// TODO: uncomment
+				// ensureLoggedIn.ensureLoggedIn(nconf.get('relative_path') + '/login'),
 				params.middleware.buildHeader,
 				application.getApplicationPage);
 
 			params.router.get('/api/make-application',
-				ensureLoggedIn.ensureLoggedIn(nconf.get('relative_path') + '/login'),
+				// TODO: uncomment
+				// ensureLoggedIn.ensureLoggedIn(nconf.get('relative_path') + '/login'),
 				application.getApplicationPage);
 
 			// post
 			params.router.post('/make-application',
-				ensureLoggedIn.ensureLoggedIn(nconf.get('relative_path') + '/login'),
+				// TODO: uncomment
+				// ensureLoggedIn.ensureLoggedIn(nconf.get('relative_path') + '/login'),
 				application.postApplicationPage);
 
 			callback(null);
-		}
+		},
+		revertUID: function (topicData, callback) {
+			if (topicData.realUID)
+				topicData.uid = topicData.realUID;
+			callback(null, topicData);
+		},
+		parseApplication: application.parseApplication
 	};
 
 	module.exports = Plugin;

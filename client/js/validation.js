@@ -2,6 +2,15 @@
 	define(function (require, exports, module) {
 
 		var rules = {
+			'i-choose-apb': {
+				required: false
+			},
+			'i-choose-bns': {
+				required: false
+			},
+			'i-choose-gta': {
+				required: false
+			},
 			'personal-firstname': {
 				'required': true,
 				'length': {
@@ -107,7 +116,10 @@
 					var notSelected = 'not-selected' === item.value;
 
 					if (notSelected) {
-						var labelText = $('label[for="' + item.id + '"]').text();
+						var labelText = '';
+						if (typeof void 0 !== typeof window && window.$)
+							labelText = $('label[for="' + item.id + '"]').text();
+
 						errors[item.id].push('Не выбрано значение: ' + labelText);
 						errors.noErrors = false;
 						return;
@@ -119,7 +131,10 @@
 
 					// if input is required but it's empty
 					if (valueIsEmpty) {
-						var labelText = $('label[for="' + item.id + '"]').text();
+						var labelText = '';
+						if (typeof void 0 !== typeof window && window.$)
+							labelText = $('label[for="' + item.id + '"]').text();
+
 						errors[item.id].push('Не заполнено поле: ' + labelText);
 						errors.noErrors = false;
 						return;
@@ -129,7 +144,10 @@
 						var lengthIsIncorrect = !validator.isLength(validator.trim(item.value), rules[item.rule].length);
 
 						if (lengthIsIncorrect) {
-							var labelText = $('label[for="' + item.id + '"]').text();
+							var labelText = '';
+							if (typeof void 0 !== typeof window && window.$)
+								labelText = $('label[for="' + item.id + '"]').text();
+
 							errors[item.id].push('Недопустимая длина для значения: ' + labelText + '\nДопустимая от ' + rules[item.rule].length.min + ' до ' + rules[item.rule].length.max);
 							errors.noErrors = false;
 							return;
@@ -141,7 +159,10 @@
 						var valueIsNotURL = !validator.isURL(validator.trim(item.value), rules[item.rule].url);
 
 						if (valueIsNotURL) {
-							var labelText = $('label[for="' + item.id + '"]').text();
+							var labelText = '';
+							if (typeof void 0 !== typeof window && window.$)
+								labelText = $('label[for="' + item.id + '"]').text();
+
 							errors[item.id].push('Недопустимое значение в: ' + labelText);
 							errors.noErrors = false;
 							return;

@@ -146,6 +146,7 @@ $(document).on('ready', function (e) {
 						value: value
 					});
 				});
+			// TODO: remove
 			console.log('initial areas', areas);
 
 			validation.validateAreas(validator, areas, function (errors) {
@@ -153,7 +154,7 @@ $(document).on('ready', function (e) {
 				// if (!errors.noErrors) return showErrors(errors);
 
 				$.ajax({
-					url: '/testing',
+					url: '/make-application',
 					type: 'POST',
 					contentType: 'application/json; charset=utf-8',
 					headers: {
@@ -163,11 +164,21 @@ $(document).on('ready', function (e) {
 					data: JSON.stringify({
 						areas: areas
 					}),
+					statusCode: {
+						400: showNodeBBError,
+						403: showNodeBBError,
+						500: showNodeBBError
+					},
 					complete: function (data) {
+						// TODO: make success alert
 						console.log('complete', data);
 					}
 				});
 
+				function showNodeBBError(data) {
+					data.responseJSON = data.responseJSON ? data.responseJSON : 'Error';
+					app.alertError(data.responseJSON);
+				}
 			});
 
 		});
