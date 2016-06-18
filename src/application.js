@@ -35,7 +35,11 @@ var req,
 	},
 	validator = require('validator'),
 	validation = require('../client/js/validation.js'),
-	applicationTemplate = fs.readFileSync(path.join(__dirname, '../templates/partials/application-template.tpl')).toString();
+	applicationTemplates = {
+		apb: fs.readFileSync(path.join(__dirname, '../templates/partials/application-template-apb.tpl')).toString()
+			// bns: fs.readFileSync(path.join(__dirname, '../templates/partials/application-template.tpl')).toString(),
+			// gta: fs.readFileSync(path.join(__dirname, '../templates/partials/application-template.tpl')).toString()
+	};
 
 var Block = {};
 
@@ -118,7 +122,7 @@ var saveApplications = function (req, callback) {
 			gameAreas = {};
 
 		async.each(req.body.areas, function (item, callback) {
-			// skip if it's char related to another game or it's game choose checkbox
+			// skip if it's a char related to another game or it's game choose checkbox
 			var matchChar = item.id.match(data.gameCharRegexp),
 				matchCheckbox = item.id.match(data.gameCheckboxRegexp);
 			if (matchChar && matchChar[1] !== choosenGame ||
@@ -140,7 +144,8 @@ var editPosts = function (req, callback) {
 			token = jwt.sign({
 				tid: topicData.tid,
 				pid: topicData.mainPid,
-				uid: req.uid
+				uid: req.uid,
+				game: choosenGame
 			}, data.jwtSecret),
 			tokenBBcode = '[application-hash=@' + token + '@]';
 
@@ -196,7 +201,7 @@ Block.parseApplication = function (payload, callback) {
 		return callback(null, payload);
 
 	db.getObject(data.redisKey + token.tid, function (err, areas) {
-		templates.parse(applicationTemplate, {
+		templates.parse(applicationTemplates[token.game], {
 			areas: areas,
 			config: {
 				relative_path: nconf.get('relative_path')

@@ -151,7 +151,7 @@ $(document).on('ready', function (e) {
 
 			validation.validateAreas(validator, areas, function (errors) {
 				// TODO: uncomment this
-				// if (!errors.noErrors) return showErrors(errors);
+				if (!errors.noErrors) return showErrors(errors);
 
 				$.ajax({
 					url: '/make-application',

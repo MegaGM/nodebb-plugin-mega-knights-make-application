@@ -1,0 +1,33 @@
+.screenshot-placeholder {
+	display        : inline-block;
+	width          : 250px;
+	height         : 140px;
+	border         : 2px dashed #dedede;
+	border-color   : #bce8f1;
+	background-size: cover;
+	cursor         : pointer;
+
+	&:hover {
+		background-color: rgba(228, 247, 255, 0.5);
+	}
+
+	&.no-border {
+		border: none;
+	}
+
+	.screenshot-url {
+		display: none;
+	}
+
+	.icon {
+		display  : block;
+		position : relative;
+		margin   : 0 auto;
+		width    : 46px;
+		height   : 46px;
+		top      : 50%;
+		transform: translateY(-50%);
+		color    : #d9edf7;
+		cursor   : default;
+	}
+}

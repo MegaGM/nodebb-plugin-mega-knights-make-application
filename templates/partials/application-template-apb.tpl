@@ -9,31 +9,31 @@
 
 					<div class="form-inline">
 						<div class="form-group">
-							<label for="personal-firstname">Имя</label>
+							<label for="personal-firstname">Имя:</label>
 							<span id="personal-firstname" class="form-control">{areas.personal-firstname}</span>
 						</div>
 						<div class="form-group">
-							<label for="personal-age">Возраст</label>
+							<label for="personal-age">Возраст:</label>
 							<span id="personal-age" class="form-control">{areas.personal-age}</span>
 						</div>
 						<div class="form-group">
-							<label for="personal-location">Страна и город</label>
+							<label for="personal-location">Страна и город:</label>
 							<span id="personal-location" class="form-control">{areas.personal-location}</span>
 						</div>
 					</div>
 
-					<div class="form-group">
-						<label for="personal-aboutme">Обо мне</label>
+					<div class="form-inline">
+						<label for="personal-aboutme">Обо мне:</label>
 						<span id="personal-aboutme" class="form-control">{areas.personal-aboutme}</span>
 					</div>
 
-					<div class="form-group form-inline">
-						<label for="contact-skype">Skype</label>
+					<div class="form-inline">
+						<label for="contact-skype">Skype:</label>
 						<span id="contact-skype" class="form-control">{areas.contact-skype}</span>
 					</div>
 
-					<div class="form-group form-inline">
-						<label for="contact-vk">VK</label>
+					<div class="form-inline">
+						<label for="contact-vk">VK:</label>
 						<span id="contact-vk" class="form-control">{areas.contact-vk}</span>
 					</div>
 				</div>

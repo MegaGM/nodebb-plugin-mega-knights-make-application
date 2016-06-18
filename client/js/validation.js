@@ -36,14 +36,14 @@
 				}
 			},
 			'contact-skype': {
-				'required': true,
+				'required': false,
 				'length': {
 					min: 6,
 					max: 32
 				}
 			},
 			'contact-vk': {
-				'required': true,
+				'required': false,
 				'url': {
 					'protocols': ['http', 'https'],
 					'allow_underscores': true,
@@ -109,7 +109,18 @@
 			};
 			// perform actual checking of the inputs
 			areas.forEach(function (item) {
-				if (!rules[item.rule].required) return;
+
+				if (!rules[item.rule].required) {
+					switch (item.value) {
+					case true:
+					case false:
+					case null:
+					case '':
+						console.log('aborted', item);
+						return;
+					}
+				}
+
 				errors[item.id] = [];
 
 				if ('select-one' === item.type) {
