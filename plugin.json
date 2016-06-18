@@ -22,6 +22,7 @@
 		"method": "revertUID"
 	}, {
 		"hook": "filter:parse.post",
-		"method": "parseApplication"
+		"method": "parseApplication",
+		"priority": 7
 	}]
 }

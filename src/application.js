@@ -26,7 +26,7 @@ var req,
 		},
 		gameCheckboxRegexp: /i-choose-(\w{3})/i,
 		gameCharRegexp: /(\w{3})-char-/i,
-		tokenBBcodeRegexp: /\[application-hash\=\"([^"]+)\"\]/i,
+		tokenBBcodeRegexp: /\[application-hash\=\@([^"]+)\@\]/i,
 		choosenGames: [],
 		newTopics: {},
 		redisKey: 'mega:applications:',
@@ -34,8 +34,8 @@ var req,
 		username: ''
 	},
 	validator = require('validator'),
-	validation = require('../client/js/validation.js');
-// newsTemplate = fs.readFileSync(path.join(__dirname, '../templates/partials/news.tpl')).toString();
+	validation = require('../client/js/validation.js'),
+	applicationTemplate = fs.readFileSync(path.join(__dirname, '../templates/partials/application-template.tpl')).toString();
 
 var Block = {};
 
@@ -142,7 +142,7 @@ var editPosts = function (req, callback) {
 				pid: topicData.mainPid,
 				uid: req.uid
 			}, data.jwtSecret),
-			tokenBBcode = '[application-hash="' + token + '"]';
+			tokenBBcode = '[application-hash=@' + token + '@]';
 
 		posts.setPostField(topicData.mainPid, 'content', tokenBBcode, callback);
 	}, callback);
@@ -183,11 +183,29 @@ Block.parseApplication = function (payload, callback) {
 
 	var match,
 		content = payload.postData.content;
-	if (!(match = content.match(tokenBBcodeRegexp)))
+	if (!(match = content.match(data.tokenBBcodeRegexp)))
 		return callback(null, payload);
 
-	payload.postData.content = content.replace(tokenBBcodeRegexp, html);
-	callback(null, payload);
+	try {
+		var token = jwt.verify(match[1], data.jwtSecret);
+	} catch (e) {
+		return callback(null, payload);
+	}
+
+	if (!token)
+		return callback(null, payload);
+
+	db.getObject(data.redisKey + token.tid, function (err, areas) {
+		templates.parse(applicationTemplate, {
+			areas: areas,
+			config: {
+				relative_path: nconf.get('relative_path')
+			}
+		}, function (html) {
+			payload.postData.content = content.replace(data.tokenBBcodeRegexp, html);
+			callback(null, payload);
+		});
+	});
 };
 
 module.exports = Block;
