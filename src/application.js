@@ -7,6 +7,7 @@ var req,
 	async = require.main.require('async'),
 	nconf = require.main.require('nconf'),
 	db = require.main.require('./src/database/redis'),
+	groups = require.main.require('./src/groups'),
 	middleware = require.main.require('./src/middleware'),
 	nbbHelpers = require.main.require('./src/controllers/helpers'),
 	plugins = require.main.require('./src/plugins'),
@@ -155,31 +156,37 @@ var editPosts = function (req, callback) {
 
 Block.postApplicationPage = function (req, res, next) {
 	console.log('postApplicationPage req.body.areas', req.body.areas);
-
-	// TODO: uncomment
-	// if (!req.uid)
-	// 	return res.status(403).json('403 Not authorized');
+	if (!req.uid)
+		return res.status(403).json('403 Not authorized');
 
 	if (!req.body.areas || !req.body.areas.length)
 		return res.status(400).json('400 Data Process Error: there-is-no-areas');
 
-	async.series({
-		validateAreas: async.apply(validateAreas, req),
-		getUserInfo: async.apply(getUserInfo, req),
-		findOutChoosenGames: async.apply(findOutChoosenGames, req),
-		createTopics: async.apply(createTopics, req),
-		saveApplications: async.apply(saveApplications, req),
-		editPosts: async.apply(editPosts, req)
-	}, function (err, results) {
-		if (err) {
-			if ('validation' === err)
-				return res.status(400).json('400 Data Process Error: not valid data has been recieved from client');
-			else
-				return next(err);
-		}
-		// TODO: callback
-		console.log('finish of series in application');
+	groups.isMember(req.uid, 'Рыцари', function (err, isMember) {
+		// if user is in Knights forumgroup tell him go away
+		if (isMember)
+			return res.status(403).json('403 Not authorized: Функционал подачи заявок Рыцарями пока не завершен');
+
+		async.series({
+			validateAreas: async.apply(validateAreas, req),
+			getUserInfo: async.apply(getUserInfo, req),
+			findOutChoosenGames: async.apply(findOutChoosenGames, req),
+			createTopics: async.apply(createTopics, req),
+			saveApplications: async.apply(saveApplications, req),
+			editPosts: async.apply(editPosts, req)
+		}, function (err, results) {
+			if (err) {
+				if ('validation' === err)
+					return res.status(400).json('400 Data Process Error: not valid data has been recieved from client');
+				else
+					return next(err);
+			}
+			// TODO: callback redirect somewhere
+			console.log('finish of series in application');
+		});
+
 	});
+
 };
 
 Block.parseApplication = function (payload, callback) {
