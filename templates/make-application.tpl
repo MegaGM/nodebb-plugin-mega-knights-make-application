@@ -4,16 +4,18 @@
 
 		<div class="row welcome-message-layout">
 			<div class="col-xs-12 welcome-message">
-				<h3 class="header">Порядок подачи заявки на вступление в Knights</h3>
+				<h2 class="header">Подать заявку на вступление в Knights</h2>
 				<div class="content">
-					<strong>1.</strong>
-					Ознакомиться с Кодексом Рыцарей. Если Вам чуждо всё, что там написано - нам не по пути.
+					<strong>1. (~2 мин) Внимательно прочитать Кодекс Рыцарей (Устав).</strong>
+					<br> Этот аподиктический документ был принят к исполнению более шести лет назад и прошел проверку на сотнях прецедентов. Все в Knights от гостей до Лидера могут быть осуждены по Кодексу Рыцарей. Незнание не освобождает от ответственности.
 					<br>
-					<strong>2.</strong>
-					Заполнить анкету. Встречают по одёжке.
 					<br>
-					<strong>3.</strong>
-					Зайти в Teamspeak для прохождения собеседования. Не нужно никого искать или покать. Ответственные за рекрутинг люди сами обратятся к Вам.
+					<strong>2. (5~15 мин) Заполнить анкету.</strong>
+					<br> Если Вы не желаете, чтобы рассмотрение заявки затягивалось - не поленитесь заполнить как можно больше полей. Лучше сделать это сразу, чем потом Вас об этом явно попросят Рекрутеры.
+					<br>
+					<br>
+					<strong>3. Зайти на наш сервер TeamSpeak для прохождения собеседования.</strong>
+					<br> Адрес как у сайта, Knights.pro Вам не нужно никого искать или покать. Ответственные за рекрутинг люди сами обратятся к Вам.
 					<br>
 				</div>
 				<div class="apply">
@@ -24,7 +26,7 @@
 
 		<div class="row statute-layout">
 			<div class="col-xs-12 statute">
-				<h3 class="header">Устав Knights</h3>
+				<h2 class="header">Кодекс Рыцарей (Устав)</h2>
 				<div class="content">{statute}</div>
 				<div class="apply">
 					<button class="btn btn-info accept-statute-btn" disabled="disabled">Продолжить</button>
@@ -39,7 +41,7 @@
 
 		<div class="row application-form-layout">
 			<div class="col-xs-12 application-form">
-				<img id="application-form-logo" src="/plugins/nodebb-plugin-mega-knights-make-application/img/mega.knights.screen.png" alt="" />
+				<img id="application-form-logo" src="/plugins/nodebb-plugin-mega-knights-make-application/img/mega.knights.screen_88.png" alt="" />
 				<h2 class="header text-center">Анкета кандидата на вступление в Knights</h2>
 
 				<div class="form-inline text-center">
@@ -177,7 +179,7 @@
 
 						<div class="col-xs-12 col-sm-6">
 							<div class="form-group">
-								<label for="contact-steam">Профиль в Steam</label>
+								<label for="contact-steam">Профиль Steam</label>
 								<br>
 								<input id="contact-steam" class="form-control" type="text" placeholder="http://steamcommunity.com/id/*****">
 							</div>

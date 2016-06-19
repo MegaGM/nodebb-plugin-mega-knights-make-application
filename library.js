@@ -15,20 +15,17 @@
 		init: function (params, callback) {
 			// get
 			params.router.get('/make-application',
-				// TODO: uncomment
-				// ensureLoggedIn.ensureLoggedIn(nconf.get('relative_path') + '/login'),
+				ensureLoggedIn.ensureLoggedIn(nconf.get('relative_path') + '/login'),
 				params.middleware.buildHeader,
 				application.getApplicationPage);
 
 			params.router.get('/api/make-application',
-				// TODO: uncomment
-				// ensureLoggedIn.ensureLoggedIn(nconf.get('relative_path') + '/login'),
+				ensureLoggedIn.ensureLoggedIn(nconf.get('relative_path') + '/login'),
 				application.getApplicationPage);
 
 			// post
 			params.router.post('/make-application',
-				// TODO: uncomment
-				// ensureLoggedIn.ensureLoggedIn(nconf.get('relative_path') + '/login'),
+				ensureLoggedIn.ensureLoggedIn(nconf.get('relative_path') + '/login'),
 				application.postApplicationPage);
 
 			callback(null);
@@ -37,6 +34,10 @@
 			if (topicData.realUID)
 				topicData.uid = topicData.realUID;
 			callback(null, topicData);
+		},
+		getPosts: function (data, callback) {
+			console.log('data getPosts: ', data);
+			callback(null, data);
 		},
 		parseApplication: application.parseApplication
 	};

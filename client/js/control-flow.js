@@ -82,6 +82,10 @@ $(document).on('ready', function (e) {
 		}
 
 		/* ================================================
+		 * Check if the statute was actually accepted
+		 * ===============================================*/
+		// TODO: statute check
+		/* ================================================
 		 * Check if games and characters were choosen and created
 		 * ===============================================*/
 		// check if at least one of the games was choosen
@@ -92,7 +96,6 @@ $(document).on('ready', function (e) {
 				return $(item).prop('checked');
 			})
 			.map(function (i, item) {
-				console.log('args in map', arguments);
 				return $(item).attr('data-game');
 			}),
 			atLeastOneGameWasChoosen = gameCheckboxes.length;
@@ -106,13 +109,10 @@ $(document).on('ready', function (e) {
 		if (!errors.noErrors) return showErrors(errors);
 
 		// check if at least one character was created for each choosen game
-		gameCheckboxes.each(function (i, item) {
-			var el = $(item),
-				game = el.attr('data-game');
-			// TODO: remove stub
-			return;
-
-			// skip if gta
+		gameCheckboxes.each(function (i, game) {
+			// TODO: stub
+			// return;
+			// skip if gta, because it doesn't require any characters
 			if ('gta' === game) return;
 
 			// get charlist for the game and check if there is no characters
@@ -134,8 +134,9 @@ $(document).on('ready', function (e) {
 			var rules = validation.rules,
 				getRuleName = validation.getRuleName;
 
-			// find and filter all inputs in application
+			// areas array will be sended to the server eventually
 			var areas = [];
+			// find and filter all inputs in application
 			$('.application-form-layout')
 				.find('input, select, textarea')
 				.filter(function (i, item) {
@@ -175,11 +176,10 @@ $(document).on('ready', function (e) {
 						value: value
 					});
 				});
-			// TODO: remove
-			console.log('initial areas', areas);
+			// TODO: remove debug
+			// console.log('initial areas', areas);
 
 			validation.validateAreas(validator, areas, function (errors) {
-				// TODO: uncomment this
 				if (!errors.noErrors) return showErrors(errors);
 
 				$.ajax({
@@ -199,8 +199,23 @@ $(document).on('ready', function (e) {
 						500: showNodeBBError
 					},
 					complete: function (data) {
-						// TODO: make success alert
-						console.log('complete', data);
+						var data = data.responseJSON;
+						app.alert({
+							type: 'success',
+							title: 'Заявка успешно создана!',
+							message: 'Вы будете перенаправлены через 5 секунд',
+							timeout: 5000,
+							clickfn: function () {
+								window.location.href = data.newURL;
+							}
+						});
+
+						setTimeout(function () {
+							if (!data || !data.tidUrls) return;
+							data.tidUrls.forEach(function (tidUrl) {
+								window.open(tidUrl);
+							});
+						}, 5000);
 					}
 				});
 

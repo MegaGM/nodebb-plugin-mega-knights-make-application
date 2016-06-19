@@ -20,10 +20,7 @@ var config = require('./config'),
  * ===============================================*/
 var validateAreas = function (req, callback) {
 	validation.validateAreas(validator, req.body.areas, function (errors) {
-		console.log('\n\n\nErrors validation', errors);
-		// TODO: stub
-		return callback(null);
-		// callback(errors.noErrors ? null : 'validation');
+		callback(errors.noErrors ? null : 'validation');
 	});
 };
 
@@ -133,8 +130,18 @@ function postApplicationPage(req, res, next) {
 				else
 					return next(err);
 			}
-			// TODO: callback redirect somewhere
-			console.log('finish of series in application');
+
+			// send info for redirecting
+			var tidUrls = [];
+
+			Object.keys(temp.newTopics)
+				.forEach(function (key) {
+					var newTopic = temp.newTopics[key];
+					tidUrls.push('/topic/' + newTopic.tid);
+				});
+			res.status(200).json({
+				tidUrls: tidUrls
+			});
 		});
 
 	});

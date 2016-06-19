@@ -1,18 +1,18 @@
 <div class="bns-related" data-game="bns">
-	Предпочтение PvP/PvE ? Основные крафтовые профессии ? (минимальный 3-й уровень) Какой у вас опыт в данной игре?
 	<hr>
 	<h3 class="header">Blade and Soul</h3>
+	Основные крафтовые профессии ? (минимальный 3-й уровень) Какой у вас опыт в данной игре?
 	<div class="form-group form-inline">
 		<label>Что предпочитаете?</label>
 		<br>
 		<div class="checkbox">
-			<label for="i-play-bns-pvp">
-				<input type="checkbox" id="i-play-bns-pvp"> PVP
+			<label for="bns-i-play-pvp">
+				<input type="checkbox" id="bns-i-play-pvp"> PVP
 			</label>
 		</div>
 		<div class="checkbox">
-			<label for="i-play-bns-pve">
-				<input type="checkbox" id="i-play-bns-pve"> PVE
+			<label for="bns-i-play-pve">
+				<input type="checkbox" id="bns-i-play-pve"> PVE
 			</label>
 		</div>
 	</div>
@@ -21,23 +21,23 @@
 		<label>В какое время вы находитесь в игре?</label>
 		<br>
 		<div class="checkbox">
-			<label for="i-play-bns-morning">
-				<input type="checkbox" id="i-play-bns-morning"> Утром
+			<label for="bns-i-play-morning">
+				<input type="checkbox" id="bns-i-play-morning"> Утром
 			</label>
 		</div>
 		<div class="checkbox">
-			<label for="i-play-bns-day">
-				<input type="checkbox" id="i-play-bns-day"> Днём
+			<label for="bns-i-play-day">
+				<input type="checkbox" id="bns-i-play-day"> Днём
 			</label>
 		</div>
 		<div class="checkbox">
-			<label for="i-play-bns-evening">
-				<input type="checkbox" id="i-play-bns-evening"> Вечером
+			<label for="bns-i-play-evening">
+				<input type="checkbox" id="bns-i-play-evening"> Вечером
 			</label>
 		</div>
 		<div class="checkbox">
-			<label for="i-play-bns-night">
-				<input type="checkbox" id="i-play-bns-night"> Ночью
+			<label for="bns-i-play-night">
+				<input type="checkbox" id="bns-i-play-night"> Ночью
 			</label>
 		</div>
 	</div>

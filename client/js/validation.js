@@ -25,7 +25,7 @@
 				'required': true,
 				'length': {
 					min: 3,
-					max: 100
+					max: 50
 				}
 			},
 			'personal-aboutme': {
@@ -44,24 +44,69 @@
 			},
 			'contact-vk': {
 				'required': false,
+				'sensitive': true,
 				'url': {
 					'protocols': ['http', 'https'],
 					'allow_underscores': true,
 					'host_whitelist': ['vk.com', 'm.vk.com']
-				},
-				'length': {
-					min: 8,
-					max: 100
+				}
+			},
+			'contact-steam': {
+				'required': false,
+				'url': {
+					'protocols': ['http', 'https'],
+					'allow_underscores': true,
+					'host_whitelist': ['steamcommunity.com']
+				}
+			},
+			'contact-social-club': {
+				'required': false,
+				'url': {
+					'protocols': ['http', 'https'],
+					'allow_underscores': true,
+					'host_whitelist': ['socialclub.rockstargames.com', 'ru.socialclub.rockstargames.com']
+				}
+			},
+			'contact-4game': {
+				'required': false,
+				'url': {
+					'protocols': ['http', 'https'],
+					'allow_underscores': true,
+					'host_whitelist': ['4gameforum.com']
+				}
+			},
+			'contact-gamersfirst': {
+				'required': false,
+				'url': {
+					'protocols': ['http', 'https'],
+					'allow_underscores': true,
+					'host_whitelist': ['uploads.forums.gamersfirst.com']
 				}
 			},
 			'apb-previous-clans': {
-				'required': false
+				'required': false,
+				'length': {
+					min: 3,
+					max: 100
+				}
 			},
 			'apb-leave-reasons': {
-				'required': false
+				'required': false,
+				'length': {
+					min: 3,
+					max: 1024
+				}
 			},
 			'apb-char-nickname': {
 				'required': true,
+				'length': {
+					min: 3,
+					max: 40
+				}
+			},
+			'apb-char-renames': {
+				'required': false,
+				'sensitive': true,
 				'length': {
 					min: 3,
 					max: 40
@@ -79,8 +124,9 @@
 			'apb-char-level': {
 				'required': true
 			},
-			'apb-char-screenshot-url-charstats': {
+			'apb-char-screenshot-url-lobby': {
 				'required': true,
+				'sensitive': true,
 				'url': {
 					'protocols': ['http', 'https'],
 					'allow_underscores': true,
@@ -90,10 +136,105 @@
 					min: 20,
 					max: 100
 				}
-			}
+			},
+			'apb-char-screenshot-url-charstats': {
+				'required': true,
+				'sensitive': true,
+				'url': {
+					'protocols': ['http', 'https'],
+					'allow_underscores': true,
+					'host_whitelist': ['imgur.com', 'i.imgur.com']
+				},
+				'length': {
+					min: 20,
+					max: 100
+				}
+			},
+			'bns-i-play-pvp': {
+				required: false
+			},
+			'bns-i-play-pve': {
+				required: false
+			},
+			'bns-i-play-morning': {
+				required: false
+			},
+			'bns-i-play-day': {
+				required: false
+			},
+			'bns-i-play-evening': {
+				required: false
+			},
+			'bns-i-play-night': {
+				required: false
+			},
+			'bns-previous-clans': {
+				required: false,
+				'length': {
+					min: 3,
+					max: 100
+				}
+			},
+			'bns-leave-reasons': {
+				required: false,
+				'length': {
+					min: 3,
+					max: 1024
+				}
+			},
+			'bns-char-nickname': {
+				'required': true,
+				'length': {
+					min: 3,
+					max: 40
+				}
+			},
+			'bns-char-renames': {
+				'required': false,
+				'sensitive': true,
+				'length': {
+					min: 3,
+					max: 40
+				}
+			},
+			'bns-char-server': {
+				'required': true
+			},
+			'bns-char-faction': {
+				'required': true
+			},
+			'bns-char-level': {
+				'required': true
+			},
+			'bns-char-screenshot-url-lobby': {
+				'required': true,
+				'sensitive': true,
+				'url': {
+					'protocols': ['http', 'https'],
+					'allow_underscores': true,
+					'host_whitelist': ['imgur.com', 'i.imgur.com']
+				},
+				'length': {
+					min: 20,
+					max: 100
+				}
+			},
+			'bns-char-screenshot-url-charstats': {
+				'required': true,
+				'sensitive': true,
+				'url': {
+					'protocols': ['http', 'https'],
+					'allow_underscores': true,
+					'host_whitelist': ['imgur.com', 'i.imgur.com']
+				},
+				'length': {
+					min: 20,
+					max: 100
+				}
+			},
 		};
 
-		var getRuleName = function (originalId) {
+		function getRuleName(originalId) {
 			if (!originalId || '' === originalId)
 				return false;
 			// gracefully remove charIndex from id if present
