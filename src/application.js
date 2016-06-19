@@ -47,25 +47,7 @@ var Block = {};
 /* ================================================
  * GET
  * ===============================================*/
-var getStatute = function (callback) {
-	posts.getPostData(data.statutePid, function (err, statuteRaw) {
-		if (err) return callback(err);
-
-		plugins.fireHook('filter:parse.raw', statuteRaw.content, function (err, statuteParsed) {
-			callback(err, statuteParsed);
-		});
-	});
-};
-
-Block.getApplicationPage = function (req, res, next) {
-	getStatute(function (err, results) {
-		if (err) return next(err);
-
-		res.render('make-application', {
-			statute: results.statute
-		});
-	});
-};
+Block.getApplicationPage = require('./getApplication.js');
 
 /* ================================================
  * POST
@@ -189,35 +171,6 @@ Block.postApplicationPage = function (req, res, next) {
 
 };
 
-Block.parseApplication = function (payload, callback) {
-	if (!payload || !payload.postData || !payload.postData.content)
-		return callback(null, payload);
-
-	var match,
-		content = payload.postData.content;
-	if (!(match = content.match(data.tokenBBcodeRegexp)))
-		return callback(null, payload);
-
-	try {
-		var token = jwt.verify(match[1], data.jwtSecret);
-	} catch (e) {
-		return callback(null, payload);
-	}
-
-	if (!token)
-		return callback(null, payload);
-
-	db.getObject(data.redisKey + token.tid, function (err, areas) {
-		templates.parse(applicationTemplates[token.game], {
-			areas: areas,
-			config: {
-				relative_path: nconf.get('relative_path')
-			}
-		}, function (html) {
-			payload.postData.content = content.replace(data.tokenBBcodeRegexp, html);
-			callback(null, payload);
-		});
-	});
-};
+Block.parseApplication = require('./parseApplication.js');
 
 module.exports = Block;
