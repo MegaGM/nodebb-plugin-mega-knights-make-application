@@ -90,6 +90,10 @@ $(document).on('ready', function (e) {
 			.find('input[data-game]')
 			.filter(function (i, item) {
 				return $(item).prop('checked');
+			})
+			.map(function (i, item) {
+				console.log('args in map', arguments);
+				return $(item).attr('data-game');
 			}),
 			atLeastOneGameWasChoosen = gameCheckboxes.length;
 
@@ -104,8 +108,15 @@ $(document).on('ready', function (e) {
 		// check if at least one character was created for each choosen game
 		gameCheckboxes.each(function (i, item) {
 			var el = $(item),
-				game = el.attr('data-game'),
-				gameCharlist = $('.chars[data-game="' + game + '"]').find('.charlist');
+				game = el.attr('data-game');
+			// TODO: remove stub
+			return;
+
+			// skip if gta
+			if ('gta' === game) return;
+
+			// get charlist for the game and check if there is no characters
+			gameCharlist = $('.chars[data-game="' + game + '"]').find('.charlist');
 			if (!$.trim(gameCharlist.html())) {
 				errors.noErrors = false;
 				// fake id
@@ -121,21 +132,39 @@ $(document).on('ready', function (e) {
 
 		require([validatorPath, validationPath, 'csrf'], function (validator, validation, csrf) {
 			var rules = validation.rules,
-				getRule = validation.getRule;
+				getRuleName = validation.getRuleName;
 
 			// find and filter all inputs in application
 			var areas = [];
 			$('.application-form-layout')
 				.find('input, select, textarea')
 				.filter(function (i, item) {
+					// filter by rule
 					var el = $(item),
-						id = getRule(el.prop('id'));
-					return !!id ? !!rules[id] : false;
+						rule = getRuleName(el.prop('id'));
+					return rule ? rules[rule] : false;
+				})
+				.filter(function (i, item) {
+					// filter by checked game checkboxes
+					var el = $(item),
+						game = el.closest('[data-game]').attr('data-game');
+
+					// if it's not game related then it's personal or contact, keep them
+					if (!game) return true;
+					console.log('filter game, id: ', game, el.prop('id'));
+					// console.log('gameCheckboxes', gameCheckboxes);
+
+					// if it's game related, check if gameCheckbox was checked
+					return gameCheckboxes
+						.filter(function (i, item) {
+							console.log('gameCheckboxes map: ', item, 'item === game', item === game);
+							return item === game
+						}).length;
 				})
 				.each(function (i, item) {
 					var el = $(item),
 						id = el.prop('id'),
-						rule = getRule(id),
+						rule = getRuleName(id),
 						type = el.prop('type'),
 						value = ('text' === type || 'textarea' === type || 'select-one' === type) ? el.val() : 'checkbox' === type ? el.prop('checked') : null;
 
@@ -177,7 +206,7 @@ $(document).on('ready', function (e) {
 
 				function showNodeBBError(data) {
 					data.responseJSON = data.responseJSON ? data.responseJSON : 'Error';
-					app.alertError(data.responseJSON);
+					app.alertError(data.responseJSON, 10 * 1000);
 				}
 			});
 

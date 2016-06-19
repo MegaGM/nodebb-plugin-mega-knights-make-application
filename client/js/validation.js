@@ -93,7 +93,7 @@
 			}
 		};
 
-		var getRule = function (originalId) {
+		var getRuleName = function (originalId) {
 			if (!originalId || '' === originalId)
 				return false;
 			// gracefully remove charIndex from id if present
@@ -110,15 +110,10 @@
 			// perform actual checking of the inputs
 			areas.forEach(function (item) {
 
+				// skip if NOT required && is empty || is a checkbox
 				if (!rules[item.rule].required) {
-					switch (item.value) {
-					case true:
-					case false:
-					case null:
-					case '':
-						console.log('aborted', item);
+					if ('checkbox' === item.type || null === item.value || '' === item.value)
 						return;
-					}
 				}
 
 				errors[item.id] = [];
@@ -186,7 +181,7 @@
 		};
 		return {
 			rules: rules,
-			getRule: getRule,
+			getRuleName: getRuleName,
 			validateAreas: validateAreas
 		};
 	});
