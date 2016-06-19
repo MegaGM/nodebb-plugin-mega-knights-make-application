@@ -1,42 +1,19 @@
 'use strict';
-var req,
-	res,
-	fs = require('fs'),
-	path = require('path'),
+var config = require('./config'),
 	jwt = require('jsonwebtoken'),
 	async = require.main.require('async'),
-	nconf = require.main.require('nconf'),
 	db = require.main.require('./src/database/redis'),
 	groups = require.main.require('./src/groups'),
-	middleware = require.main.require('./src/middleware'),
-	nbbHelpers = require.main.require('./src/controllers/helpers'),
-	plugins = require.main.require('./src/plugins'),
 	posts = require.main.require('./src/posts'),
-	privileges = require.main.require('./src/privileges'),
 	topics = require.main.require('./src/topics'),
-	templates = require.main.require('templates.js'),
 	user = require.main.require('./src/user'),
-	data = {
-		title: 'Создать заявку',
-		breadcrumbs: nbbHelpers.buildBreadcrumbs([{}]),
-		statutePid: '2',
-		gameCids: {
-			apb: 14,
-			bns: 22,
-			gta: 9
-		},
-		gameCheckboxRegexp: /i-choose-(\w{3})/i,
-		gameCharRegexp: /(\w{3})-char-/i,
-		tokenBBcodeRegexp: /\[application-hash\=\@([^"]+)\@\]/i,
+	temp = {
 		choosenGames: [],
 		newTopics: {},
-		redisKey: 'mega:applications:',
-		jwtSecret: 'megasecretkeyboardcatlolmeow',
 		username: ''
 	},
 	validator = require('validator'),
-	validation = require('../client/js/validation.js'),
-	gameTemplates = require('./gameTemplates');
+	validation = require('../client/js/validation.js');
 
 /* ================================================
  * POST
@@ -51,52 +28,56 @@ var validateAreas = function (req, callback) {
 };
 
 var getUserInfo = function (req, callback) {
+	temp.username = '';
 	user.getUserField(req.uid, 'username', function (err, username) {
-		data.username = username;
+		temp.username = username;
 		callback(err);
 	});
 };
 
 var findOutChoosenGames = function (req, callback) {
+	temp.choosenGames = [];
 	async.each(req.body.areas, function (item, callback) {
 		var match;
-		if (!(match = item.id.match(data.gameCheckboxRegexp)))
+		if (!(match = item.id.match(config.gameCheckboxRegexp)))
 			return callback(null);
 		if (item.value)
-			data.choosenGames.push(match[1]);
+			temp.choosenGames.push(match[1]);
 		callback(null);
 	}, callback);
 };
 
 var createTopics = function (req, callback) {
-	async.each(data.choosenGames, function (choosenGame, callback) {
+	temp.newTopics = {};
+	async.each(temp.choosenGames, function (choosenGame, callback) {
 		var topicData = {
+			// monkey patch to decieve NodeBB privilegies check
 			uid: 1,
+			// it will be reverted back to realUID in filter:parse.post hook
 			realUID: req.uid,
-			cid: data.gameCids[choosenGame],
-			title: 'Заявка на вступление от ' + data.username,
+			cid: config.gameCids[choosenGame],
+			title: 'Заявка на вступление от ' + temp.username,
 			content: 'make-application placeholder',
 			tags: [choosenGame, 'Заявка'],
 			timestamp: Date.now()
 		};
 
 		topics.post(topicData, function (err, createdTopicData) {
-			// data.newTopics.push(createdTopicData.topicData);
-			data.newTopics[choosenGame] = createdTopicData.topicData;
+			temp.newTopics[choosenGame] = createdTopicData.topicData;
 			callback(err);
 		});
 	}, callback);
 };
 
 var saveApplications = function (req, callback) {
-	async.each(data.choosenGames, function (choosenGame, callback) {
-		var topicData = data.newTopics[choosenGame],
+	async.each(temp.choosenGames, function (choosenGame, callback) {
+		var topicData = temp.newTopics[choosenGame],
 			gameAreas = {};
 
 		async.each(req.body.areas, function (item, callback) {
-			// skip if it's a char related to another game or it's game choose checkbox
-			var matchChar = item.id.match(data.gameCharRegexp),
-				matchCheckbox = item.id.match(data.gameCheckboxRegexp);
+			// skip if it's a char related to another game or it's game choosing checkbox
+			var matchChar = item.id.match(config.gameCharRegexp),
+				matchCheckbox = item.id.match(config.gameCheckboxRegexp);
 			if (matchChar && matchChar[1] !== choosenGame ||
 				matchCheckbox && matchCheckbox[1] !== choosenGame)
 				return callback(null);
@@ -104,21 +85,21 @@ var saveApplications = function (req, callback) {
 			gameAreas[item.id] = item.value;
 			callback(null);
 		}, function (err, results) {
-			db.setObject(data.redisKey + topicData.tid, gameAreas, callback);
+			db.setObject(config.redisKey + topicData.tid, gameAreas, callback);
 		});
 
 	}, callback);
 };
 
 var editPosts = function (req, callback) {
-	async.each(data.choosenGames, function (choosenGame, callback) {
-		var topicData = data.newTopics[choosenGame],
+	async.each(temp.choosenGames, function (choosenGame, callback) {
+		var topicData = temp.newTopics[choosenGame],
 			token = jwt.sign({
 				tid: topicData.tid,
 				pid: topicData.mainPid,
 				uid: req.uid,
 				game: choosenGame
-			}, data.jwtSecret),
+			}, config.jwtSecret),
 			tokenBBcode = '[application-hash=@' + token + '@]';
 
 		posts.setPostField(topicData.mainPid, 'content', tokenBBcode, callback);

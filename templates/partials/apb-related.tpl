@@ -1,13 +1,16 @@
 <div class="apb-related" data-game="apb">
+	<!-- IF !areas -->
 	<hr>
 	<h3 class="header">APB: Reloaded</h3>
+	<!-- ENDIF !areas -->
 
 	<div class="row">
 
 		<div class="col-xs-12 col-md-8">
 			<div class="form-group">
 				<label for="apb-previous-clans">Названия всех кланов, в которых состояли все Ваши персонажи</label>
-				<input id="apb-previous-clans" class="form-control" type="text" placeholder="WASP, 8Bit, BitFenix">
+				<input id="apb-previous-clans" class="form-control" type="text" placeholder="WASP, 8Bit, BitFenix" <!-- IF areas.apb-previous-clans --> readonly value="{areas.apb-previous-clans}"
+				<!-- ENDIF areas.apb-previous-clans -->>
 			</div>
 
 			<div class="form-group">

@@ -39,29 +39,30 @@
 
 		<div class="row application-form-layout">
 			<div class="col-xs-12 application-form">
-				<img src="/plugins/nodebb-plugin-mega-knights-make-application/img/mega.knights.screen.png" alt="" />
-				<h2 class="header">Анкета кандидата на вступление в Knights</h2>
+				<img id="application-form-logo" src="/plugins/nodebb-plugin-mega-knights-make-application/img/mega.knights.screen.png" alt="" />
+				<h2 class="header text-center">Анкета кандидата на вступление в Knights</h2>
 
-				<div class="form-group choose-game">
-					<label>Выберите подразделения, в которые желаете вступить</label>
-					<br>
-					<div class="checkbox">
-						<label for="i-choose-apb">
-							<input type="checkbox" id="i-choose-apb" data-game="apb"> APB: Reloaded
-						</label>
-					</div>
-					<div class="checkbox">
-						<label for="i-choose-bns">
-							<input type="checkbox" id="i-choose-bns" data-game="bns"> Blade and Soul
-						</label>
-					</div>
-					<div class="checkbox">
-						<label for="i-choose-gta">
-							<input type="checkbox" id="i-choose-gta" data-game="gta"> GTA Online
-						</label>
+				<div class="form-inline text-center">
+					<div class="form-group choose-game">
+						<label>Выберите подразделения, в которые желаете вступить</label>
+						<br>
+						<div class="checkbox">
+							<label for="i-choose-apb">
+								<input type="checkbox" id="i-choose-apb" data-game="apb"> APB: Reloaded
+							</label>
+						</div>
+						<div class="checkbox">
+							<label for="i-choose-bns">
+								<input type="checkbox" id="i-choose-bns" data-game="bns"> Blade and Soul
+							</label>
+						</div>
+						<div class="checkbox">
+							<label for="i-choose-gta">
+								<input type="checkbox" id="i-choose-gta" data-game="gta"> GTA Online
+							</label>
+						</div>
 					</div>
 				</div>
-
 				<div class="personal-related">
 					<hr>
 					<h3 class="header">Персональная информация</h3>

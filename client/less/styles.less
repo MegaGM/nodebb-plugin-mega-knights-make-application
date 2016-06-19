@@ -23,6 +23,10 @@
 	background: #fff;
 }
 
+.application-form-layout {
+	background-color: #77d3ee;
+}
+
 .application-form-layout,
 .statute-layout,
 .welcome-message-layout {
@@ -68,10 +72,6 @@
 }
 
 [component="post"] {
-	.apb-related {
-		display: block;
-	}
-
 	.form-control {
 		display       : inline-block;
 		height        : initial;
@@ -81,6 +81,11 @@
 		border        : none;
 		box-shadow    : none;
 		transition    : none;
+
+		&[readonly] {
+			background-color: initial;
+			opacity         : 1;
+		}
 	}
 
 	.form-group {
