@@ -1,6 +1,10 @@
+var nbbHelpers = require.main.require('./src/controllers/helpers');
+
 var config = {
 	title: 'Создать заявку',
-	breadcrumbs: nbbHelpers.buildBreadcrumbs([{}]),
+	breadcrumbs: nbbHelpers.buildBreadcrumbs([{
+		text: 'Создать заявку'
+	}]),
 	statutePid: '2',
 	gameCids: {
 		apb: 14,

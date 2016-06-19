@@ -3,14 +3,14 @@ $(document).on('ready', function (e) {
 	 * characters logic
 	 * ===============================================*/
 	// on adding screenshot
-	$(document).on('click', '.screenshot-placeholder', function (e) {
+	$(document).on('click', '.application-form-layout .screenshot-placeholder', function (e) {
 		var el = $(e.target);
 		el.find('.screenshot-fileinput').trigger('click');
 	});
 
 	// on uploading screenshot
 	require(['csrf'], function (csrf) {
-		$(document).on('change', '.screenshot-fileinput', function (e) {
+		$(document).on('change', '.application-form-layout .screenshot-fileinput', function (e) {
 			var el = $(e.target),
 				form = el.closest('form'),
 				placeholder = el.closest('.screenshot-placeholder'),

@@ -1,14 +1,8 @@
-"use strict";
-var fs = require('fs'),
-	path = require('path'),
+'use strict';
+var config = require('./config'),
 	jwt = require('jsonwebtoken'),
 	db = require.main.require('./src/database/redis'),
 	templates = require.main.require('templates.js'),
-	data = {
-		tokenBBcodeRegexp: /\[application-hash\=\@([^"]+)\@\]/i,
-		redisKey: 'mega:applications:',
-		jwtSecret: 'megasecretkeyboardcatlolmeow'
-	},
 	gameTemplates = require('./gameTemplates');
 
 function parseApplication(payload, callback) {
@@ -17,11 +11,11 @@ function parseApplication(payload, callback) {
 
 	var match,
 		content = payload.postData.content;
-	if (!(match = content.match(data.tokenBBcodeRegexp)))
+	if (!(match = content.match(config.tokenBBcodeRegexp)))
 		return callback(null, payload);
 
 	try {
-		var token = jwt.verify(match[1], data.jwtSecret);
+		var token = jwt.verify(match[1], config.jwtSecret);
 	} catch (e) {
 		return callback(null, payload);
 	}
@@ -29,11 +23,11 @@ function parseApplication(payload, callback) {
 	if (!token)
 		return callback(null, payload);
 
-	db.getObject(data.redisKey + token.tid, function (err, areas) {
+	db.getObject(config.redisKey + token.tid, function (err, areas) {
 		templates.parse(gameTemplates[token.game], {
 			areas: areas
 		}, function (html) {
-			payload.postData.content = content.replace(data.tokenBBcodeRegexp, html);
+			payload.postData.content = content.replace(config.tokenBBcodeRegexp, html);
 			callback(null, payload);
 		});
 	});
