@@ -10,11 +10,7 @@ var fs = require('fs'),
 		jwtSecret: 'megasecretkeyboardcatlolmeow',
 		username: ''
 	},
-	gameTemplates = {
-		apb: fs.readFileSync(path.join(__dirname, '../templates/partials/apb-related.tpl')).toString()
-			// bns: fs.readFileSync(path.join(__dirname, '../templates/partials/application-template.tpl')).toString(),
-			// gta: fs.readFileSync(path.join(__dirname, '../templates/partials/application-template.tpl')).toString()
-	};
+	gameTemplates = require('./gameTemplates');
 
 function parseApplication(payload, callback) {
 	if (!payload || !payload.postData || !payload.postData.content)

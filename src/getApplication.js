@@ -37,13 +37,7 @@ var req,
 	},
 	validator = require('validator'),
 	validation = require('../client/js/validation.js'),
-	gameTemplates = {
-		apb: fs.readFileSync(path.join(__dirname, '../templates/partials/apb-related.tpl')).toString(),
-		bns: fs.readFileSync(path.join(__dirname, '../templates/partials/apb-related.tpl')).toString(),
-		gta: fs.readFileSync(path.join(__dirname, '../templates/partials/apb-related.tpl')).toString()
-			// bns: fs.readFileSync(path.join(__dirname, '../templates/partials/application-template.tpl')).toString(),
-			// gta: fs.readFileSync(path.join(__dirname, '../templates/partials/application-template.tpl')).toString()
-	};
+	gameTemplates = require('./gameTemplates');
 
 var Block = {};
 

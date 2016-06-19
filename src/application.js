@@ -36,11 +36,7 @@ var req,
 	},
 	validator = require('validator'),
 	validation = require('../client/js/validation.js'),
-	applicationTemplates = {
-		apb: fs.readFileSync(path.join(__dirname, '../templates/partials/application-template-apb.tpl')).toString()
-			// bns: fs.readFileSync(path.join(__dirname, '../templates/partials/application-template.tpl')).toString(),
-			// gta: fs.readFileSync(path.join(__dirname, '../templates/partials/application-template.tpl')).toString()
-	};
+	gameTemplates = require('./gameTemplates');
 
 var Block = {};
 
