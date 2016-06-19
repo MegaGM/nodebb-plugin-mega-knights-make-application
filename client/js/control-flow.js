@@ -111,7 +111,7 @@ $(document).on('ready', function (e) {
 		// check if at least one character was created for each choosen game
 		gameCheckboxes.each(function (i, game) {
 			// TODO: stub
-			// return;
+			return;
 			// skip if gta, because it doesn't require any characters
 			if ('gta' === game) return;
 
@@ -206,15 +206,13 @@ $(document).on('ready', function (e) {
 							message: 'Вы будете перенаправлены через 5 секунд',
 							timeout: 5000,
 							clickfn: function () {
-								window.location.href = data.newURL;
+								window.location.href = data.tidUrls[0];
 							}
 						});
 
 						setTimeout(function () {
 							if (!data || !data.tidUrls) return;
-							data.tidUrls.forEach(function (tidUrl) {
-								window.open(tidUrl);
-							});
+							window.location.href = data.tidUrls[0];
 						}, 5000);
 					}
 				});
