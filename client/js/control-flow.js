@@ -17,7 +17,7 @@ $(document).on('ready', function (e) {
 	/* ================================================
 	 * choosing game logic
 	 * ===============================================*/
-	$(document).on('change', '.choose-game input', function (e) {
+	$(document).on('change', '.application-form-layout .choose-game input', function (e) {
 		var el = $(e.target),
 			game = el.attr('data-game'),
 			show = el.prop('checked');
@@ -56,7 +56,7 @@ $(document).on('ready', function (e) {
 	});
 
 	// third step
-	$(document).on('click', '.submit-application', function (e) {
+	$(document).on('click', '.application-form-layout .submit-application', function (e) {
 		/* ================================================
 		 * handler to show errors to client
 		 * ===============================================*/

@@ -8,7 +8,8 @@ $(document).on('ready', function (e) {
 
 		function fillApplicationForm() {
 			if ('/make-application' !== window.location.pathname) return;
-			if (!store || !store.enabled) return console.error('LocalStorage is not available');
+			if (!store || !store.enabled)
+				return console.error('LocalStorage is not available');
 
 			var data = store.getAll();
 			Object.keys(data).forEach(function (key, i) {

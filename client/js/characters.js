@@ -4,7 +4,7 @@ $(document).on('ready', function (e) {
 	 * characters logic
 	 * ===============================================*/
 	// on adding character
-	$(document).on('click', '.charlist-add', function (e) {
+	$(document).on('click', '.application-form-layout .charlist-add', function (e) {
 		var el = $(e.target),
 			game = el.closest('[data-game]').attr('data-game');
 		app.parseAndTranslate('partials/' + game + '-character', {
@@ -15,7 +15,7 @@ $(document).on('ready', function (e) {
 	});
 
 	// on removing character
-	$(document).on('click', '.charlist-remove', function (e) {
+	$(document).on('click', '.application-form-layout .charlist-remove', function (e) {
 		var el = $(e.target);
 		el.closest('.char').remove();
 	});
