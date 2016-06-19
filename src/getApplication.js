@@ -4,6 +4,7 @@ var req,
 	fs = require('fs'),
 	path = require('path'),
 	jwt = require('jsonwebtoken'),
+	Promise = require('bluebird'),
 	async = require.main.require('async'),
 	nconf = require.main.require('nconf'),
 	db = require.main.require('./src/database/redis'),
@@ -36,8 +37,10 @@ var req,
 	},
 	validator = require('validator'),
 	validation = require('../client/js/validation.js'),
-	applicationTemplates = {
-		apb: fs.readFileSync(path.join(__dirname, '../templates/partials/application-template-apb.tpl')).toString()
+	gameTemplates = {
+		apb: fs.readFileSync(path.join(__dirname, '../templates/partials/apb-related.tpl')).toString(),
+		bns: fs.readFileSync(path.join(__dirname, '../templates/partials/apb-related.tpl')).toString(),
+		gta: fs.readFileSync(path.join(__dirname, '../templates/partials/apb-related.tpl')).toString()
 			// bns: fs.readFileSync(path.join(__dirname, '../templates/partials/application-template.tpl')).toString(),
 			// gta: fs.readFileSync(path.join(__dirname, '../templates/partials/application-template.tpl')).toString()
 	};
@@ -47,30 +50,44 @@ var Block = {};
 /* ================================================
  * GET
  * ===============================================*/
-function getStatute(callback) {
-	posts.getPostData(data.statutePid, function (err, statuteRaw) {
-		if (err) return callback(err);
+function getStatute() {
+	return new Promise((resolve, reject) => {
+		posts.getPostData(data.statutePid, function (err, statuteRaw) {
+			if (err) return reject(err);
 
-		plugins.fireHook('filter:parse.raw', statuteRaw.content, function (err, statuteParsed) {
-			callback(err, statuteParsed);
+			plugins.fireHook('filter:parse.raw', statuteRaw.content, function (err, statuteParsed) {
+				if (err) return reject(err);
+				resolve(statuteParsed);
+			});
 		});
 	});
 }
 
-function parseTemplate(game, callback) {
-	templates.parse(gameTemplates[game], {}, function (html) {
-		callback(null, html);
+function parseTemplate(game) {
+	return new Promise((resolve, reject) => {
+		templates.parse(gameTemplates[game], {}, function (html) {
+			resolve(html);
+		});
 	});
 }
 
 function getApplicationPage(req, res, next) {
-	getStatute(function (err, statute) {
-		if (err) return next(err);
+	Promise.all([
+			getStatute(),
+			parseTemplate('apb'),
+			parseTemplate('bns'),
+			parseTemplate('gta')
+		])
+		.then(results => {
+			res.render('make-application', {
+				statute: results[0],
+				apbRelated: results[1],
+				bnsRelated: results[2],
+				gtaRelated: results[3]
+			});
+		})
+		.catch(err => next(err));
 
-		res.render('make-application', {
-			statute: statute
-		});
-	});
 }
 
 module.exports = getApplicationPage;
