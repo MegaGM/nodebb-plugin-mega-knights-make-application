@@ -18,22 +18,9 @@ var req,
 	templates = require.main.require('templates.js'),
 	user = require.main.require('./src/user'),
 	data = {
-		title: 'Создать заявку',
-		breadcrumbs: nbbHelpers.buildBreadcrumbs([{}]),
 		statutePid: '2',
-		gameCids: {
-			apb: 14,
-			bns: 22,
-			gta: 9
-		},
-		gameCheckboxRegexp: /i-choose-(\w{3})/i,
-		gameCharRegexp: /(\w{3})-char-/i,
-		tokenBBcodeRegexp: /\[application-hash\=\@([^"]+)\@\]/i,
-		choosenGames: [],
-		newTopics: {},
-		redisKey: 'mega:applications:',
-		jwtSecret: 'megasecretkeyboardcatlolmeow',
-		username: ''
+		title: 'Создать заявку',
+		breadcrumbs: nbbHelpers.buildBreadcrumbs([{text:'Создать заявку'}])
 	},
 	validator = require('validator'),
 	validation = require('../client/js/validation.js'),
@@ -74,6 +61,8 @@ function getApplicationPage(req, res, next) {
 		])
 		.then(results => {
 			res.render('make-application', {
+				title: data.title,
+				breadcrumbs: data.breadcrumbs,
 				statute: results[0],
 				apbRelated: results[1],
 				bnsRelated: results[2],

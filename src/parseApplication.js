@@ -7,8 +7,7 @@ var fs = require('fs'),
 	data = {
 		tokenBBcodeRegexp: /\[application-hash\=\@([^"]+)\@\]/i,
 		redisKey: 'mega:applications:',
-		jwtSecret: 'megasecretkeyboardcatlolmeow',
-		username: ''
+		jwtSecret: 'megasecretkeyboardcatlolmeow'
 	},
 	gameTemplates = require('./gameTemplates');
 
