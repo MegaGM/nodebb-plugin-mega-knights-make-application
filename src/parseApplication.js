@@ -1,19 +1,33 @@
 'use strict';
-var config = require('./config'),
+let config = require('./config'),
 	_ = require('lodash'),
 	jwt = require('jsonwebtoken'),
+	Promise = require('bluebird'),
 	async = require.main.require('async'),
 	db = require.main.require('./src/database/redis'),
 	groups = require.main.require('./src/groups'),
 	templates = require.main.require('templates.js'),
 	validation = require('../client/js/validation'),
-	gameTemplates = require('./gameTemplates');
+	applicationPartials = require('./applicationPartials');
+
+/* ================================================
+ * plugin for parsing application BBcode
+ * ===============================================*/
+templates.registerHelper('woProtocol', function (str) {
+	return str ? str.replace(/^https?\:\/\//i, '') : 'nothing!';
+});
+
+function parseTemplate(template, data) {
+	return new Promise((resolve, reject) => {
+		templates.parse(template, data, function (html) {
+			resolve(html);
+		});
+	});
+}
 
 function parseApplication(payload, callback) {
 	if (!payload || !payload.postData || !payload.postData.content)
 		return callback(null, payload);
-	//TODO:remove dubug
-	console.log('payload.postData', payload);
 
 	var match,
 		content = payload.postData.content;
@@ -29,36 +43,31 @@ function parseApplication(payload, callback) {
 	if (!token || token.tid != payload.postData.tid)
 		return callback(null, payload);
 
-	var isKnight = false,
-		rules = validation.rules,
-		getRuleName = validation.getRuleName;
-	// FIX: monkey patch for debug
-	var req = {
-		uid: 1
-	};
+	// TODO: realise filter for sensitive info based on req.uid's Рыцари group membership
 
-	async.waterfall([
-		async.apply(groups.isMember, req.uid, 'Рыцари'),
-		(isMember, callback) => {
-			isKnight = isMember;
-			return callback(null);
-		},
-		async.apply(db.getObject, config.redisKey + token.tid),
-		(areas, callback) => {
-			console.log('areas: ', areas);
-			areas = _.filter(areas, function (area) {
-				return area.sensitive ? isKnight : true;
+	let dbGetObject = Promise.promisify(db.getObject);
+
+	dbGetObject(config.redisKey + token.tid)
+		.then(areas => {
+			_.each(Object.keys(areas), function (key) {
+				let area = areas[key];
+				if ('string' == typeof area && area.match(/^https?\:\/\//i))
+					areas[key + '-parsed'] = area.substring(area.lastIndexOf('/') + 1);
 			});
-			templates.parse(gameTemplates[token.game], {
+			return {
 				areas: areas
-			}, function (html) {
-				payload.postData.content = content.replace(config.tokenBBcodeRegexp, html);
-				callback(null, payload);
-			});
-		}
-	], function (err) {
-		callback(null, payload);
-	})
+			}
+		})
+		.then(areas => {
+			return [
+				parseTemplate(applicationPartials['personal'], areas),
+				parseTemplate(applicationPartials[token.game], areas)
+			];
+		}).spread((personal, game) => {
+			payload.postData.content = content
+				.replace(config.tokenBBcodeRegexp, personal + ' ' + game);
+			callback(null, payload);
+		});
 }
 
 module.exports = parseApplication;

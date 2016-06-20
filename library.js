@@ -35,10 +35,6 @@
 				topicData.uid = topicData.realUID;
 			callback(null, topicData);
 		},
-		getPosts: function (data, callback) {
-			console.log('data getPosts: ', data);
-			callback(null, data);
-		},
 		parseApplication: application.parseApplication
 	};
 

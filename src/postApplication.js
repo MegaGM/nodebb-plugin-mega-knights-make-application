@@ -104,7 +104,6 @@ var editPosts = function (req, callback) {
 };
 
 function postApplicationPage(req, res, next) {
-	console.log('postApplicationPage req.body.areas', req.body.areas);
 	if (!req.uid)
 		return res.status(403).json('403 Not authorized');
 
