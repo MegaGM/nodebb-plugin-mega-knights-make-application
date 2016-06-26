@@ -18,8 +18,17 @@
   "homepage": "https://github.com/MegaGM/nodebb-plugin-mega-knights-make-application#readme",
   "dependencies": {
     "bluebird": "^3.4.1",
+    "handlebars": "^4.0.5",
     "jsonwebtoken": "^7.0.1",
     "lodash": "^4.13.1",
+    "require-all": "^2.0.0",
     "validator": "^5.4.0"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-compressor": "^0.1.0",
+    "gulp-define-module": "^0.1.4",
+    "gulp-handlebars": "^4.0.0",
+    "gulp-wrap": "^0.13.0"
   }
 }

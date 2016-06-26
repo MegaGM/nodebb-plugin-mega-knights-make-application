@@ -82,7 +82,22 @@ var saveApplications = function (req, callback) {
 			gameAreas[item.id] = item.value;
 			callback(null);
 		}, function (err, results) {
-			db.setObject(config.redisKey + topicData.tid, gameAreas, callback);
+			let status = {
+				pending: true,
+				resolved: false,
+				rejected: false,
+				approved: false
+			};
+			async.parallel([
+				async.apply(db.setObject, config.redisKey + topicData.tid + ':application', gameAreas),
+				async.apply(db.setObject, config.redisKey + topicData.tid + ':status', status),
+				// async.apply(db.sortedSetAdd, +topicData.tid + ':votes', 1, topicData.tid),
+				async.apply(db.sortedSetAdd, config.redisKey + 'created', Date.now(), topicData.tid),
+				async.apply(db.sortedSetAdd, config.redisKey + 'pending', 1, topicData.tid),
+				async.apply(db.sortedSetAdd, config.redisKey + 'resolved', 0, topicData.tid),
+				async.apply(db.sortedSetAdd, config.redisKey + 'rejected', 0, topicData.tid),
+				async.apply(db.sortedSetAdd, config.redisKey + 'approved', 0, topicData.tid)
+			], callback);
 		});
 
 	}, callback);

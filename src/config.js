@@ -12,7 +12,7 @@ var config = {
 		gta: 9
 	},
 	gameCheckboxRegexp: /i-choose-(\w{3})/i,
-	gameCharRegexp: /(\w{3})-char-/i,
+	gameCharRegexp: /(\w{3})-char-(\d+)/i,
 	tokenBBcodeRegexp: /\[application-hash\=\@([^"]+)\@\]/i,
 	choosenGames: [],
 	newTopics: {},

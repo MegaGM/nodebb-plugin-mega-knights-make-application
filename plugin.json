@@ -3,16 +3,18 @@
 	"name": "Make application page for Knights",
 	"library": "./library.js",
 	"scripts": [
+		"client/js/requirejs-inject.js",
 		"client/js/control-flow.js",
 		"client/js/local-storage.js",
 		"client/js/characters.js",
 		"client/js/screenshots.js"
 	],
-	"less": ["client/less/styles.less"],
-	"templates": "templates",
+	"less": ["src/less/styles.less"],
+	"templates": "src/nbb-templates",
 	"staticDirs": {
 		"js": "client/js",
-		"img": "client/img"
+		"img": "client/img",
+		"templates": "client/templates"
 	},
 	"hooks": [{
 		"hook": "static:app.load",

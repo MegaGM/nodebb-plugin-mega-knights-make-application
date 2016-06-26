@@ -1,10 +1,11 @@
 'use strict';
-var config = require('./config'),
+let config = require('./config'),
 	Promise = require('bluebird'),
 	posts = require.main.require('./src/posts'),
-	plugins = require.main.require('./src/plugins'),
-	templates = require.main.require('templates.js'),
-	applicationPartials = require('./applicationPartials');
+	plugins = require.main.require('./src/plugins');
+
+let Handlebars = require('handlebars');
+require('../client/templates');
 
 /* ================================================
  * GET
@@ -23,33 +24,42 @@ function getStatute() {
 	});
 }
 
-function parseTemplate(game) {
+function parsePartial(partial) {
 	return new Promise((resolve, reject) => {
-		templates.parse(applicationPartials[game], {}, function (html) {
-			resolve(html);
-		});
+		let html = Handlebars.partials[partial]({});
+		resolve(html);
 	});
 }
 
 function getApplicationPage(req, res, next) {
-	Promise.all([
+	Promise.join(
 			getStatute(),
-			parseTemplate('personal'),
-			parseTemplate('apb'),
-			parseTemplate('bns'),
-			parseTemplate('gta')
-		])
-		.then(results => {
-			res.render('make-application', {
-				title: config.title,
-				breadcrumbs: config.breadcrumbs,
-				statute: results[0],
-				personalRelated: results[1],
-				apbRelated: results[2],
-				bnsRelated: results[3],
-				gtaRelated: results[4]
-			});
-		})
+			parsePartial('personal-related'),
+			parsePartial('apb-related'),
+			parsePartial('bns-related'),
+			parsePartial('gta-related'),
+			(statuteParsed, personal, apb, bns, gta) => {
+				res.render('make-application', {
+					title: config.title,
+					breadcrumbs: config.breadcrumbs,
+					statute: statuteParsed,
+					personalRelated: personal,
+					apbRelated: apb,
+					bnsRelated: bns,
+					gtaRelated: gta
+				});
+			})
+		// .then(results => {
+		// 	res.render('make-application', {
+		// 		title: config.title,
+		// 		breadcrumbs: config.breadcrumbs,
+		// 		statute: results[0],
+		// 		personalRelated: results[1],
+		// 		apbRelated: results[2],
+		// 		bnsRelated: results[3],
+		// 		gtaRelated: results[4]
+		// 	});
+		// })
 		.catch(err => next(err));
 
 }

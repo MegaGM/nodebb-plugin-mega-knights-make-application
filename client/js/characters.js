@@ -7,11 +7,20 @@ $(document).on('ready', function (e) {
 	$(document).on('click', '.application-form-layout .charlist-add', function (e) {
 		var el = $(e.target),
 			game = el.closest('[data-game]').attr('data-game');
-		app.parseAndTranslate('partials/' + game + '-character', {
-			charI: ++charI
-		}, function (html) {
+
+		var modulePath = '../../plugins/nodebb-plugin-mega-knights-make-application/',
+			bundlePath = modulePath + 'templates/index.js';
+		require(['handlebars', bundlePath], function (Handlebars) {
+			var html = Handlebars.partials['characters/' + game]({
+				charI: ++charI
+			});
 			el.closest('[data-game]').find('.charlist').append(html);
 		});
+		// app.parseAndTranslate('partials/' + game + '-character', {
+		// 	charI: ++charI
+		// }, function (html) {
+		// 	el.closest('[data-game]').find('.charlist').append(html);
+		// });
 	});
 
 	// on removing character

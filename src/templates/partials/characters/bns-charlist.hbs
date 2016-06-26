@@ -1,0 +1,13 @@
+<div class="chars panel panel-info" data-game="{{dataGame}}">
+	<div class="panel-heading">Персонажи в игре Blade and Soul</div>
+	<div class="panel-body">
+		<div class="charlist">
+			{{#if chars}}
+				{{{chars}}}
+			{{/if}}
+		</div>
+		{{#unless chars}}
+			<i class="charlist-add fa fa-user-plus text-success fa-2x"></i>
+		{{/unless}}
+	</div>
+</div>

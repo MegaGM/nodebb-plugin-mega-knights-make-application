@@ -85,6 +85,7 @@ $(document).on('ready', function (e) {
 		 * Check if the statute was actually accepted
 		 * ===============================================*/
 		// TODO: statute check
+
 		/* ================================================
 		 * Check if games and characters were choosen and created
 		 * ===============================================*/
@@ -126,11 +127,7 @@ $(document).on('ready', function (e) {
 
 		if (!errors.noErrors) return showErrors(errors);
 
-		var modulePath = '../../plugins/nodebb-plugin-mega-knights-make-application',
-			validatorPath = modulePath + '/js/lib/validator.min.js',
-			validationPath = modulePath + '/js/validation.js';
-
-		require([validatorPath, validationPath, 'csrf'], function (validator, validation, csrf) {
+		require(['make-application/validator', 'make-application/validation', 'csrf'], function (validator, validation, csrf) {
 			var rules = validation.rules,
 				getRuleName = validation.getRuleName;
 
@@ -176,8 +173,6 @@ $(document).on('ready', function (e) {
 						value: value
 					});
 				});
-			// TODO: remove debug
-			// console.log('initial areas', areas);
 
 			validation.validateAreas(validator, areas, function (errors) {
 				if (!errors.noErrors) return showErrors(errors);

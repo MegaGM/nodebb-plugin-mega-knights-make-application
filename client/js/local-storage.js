@@ -2,9 +2,8 @@ $(document).on('ready', function (e) {
 	/* ================================================
 	 * localStorage manipulations
 	 * ===============================================*/
-	var storagePrefix = 'make-application:',
-		localStorePath = '../../plugins/nodebb-plugin-mega-knights-make-application/js/lib/store.min.js';
-	require([localStorePath], function (store) {
+	var storagePrefix = 'make-application:';
+	require(['make-application/localStorage'], function (store) {
 
 		function fillApplicationForm() {
 			if ('/make-application' !== window.location.pathname) return;
