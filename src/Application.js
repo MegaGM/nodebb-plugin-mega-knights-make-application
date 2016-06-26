@@ -1,3 +1,5 @@
+'use strict';
+
 let config = require('./config'),
 	db = require.main.require('./src/database/redis');
 
