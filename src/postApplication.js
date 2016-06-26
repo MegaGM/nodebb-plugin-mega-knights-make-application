@@ -118,7 +118,7 @@ function postApplicationPage(req, res, next) {
 	groups.isMember(req.uid, 'Рыцари', function (err, isMember) {
 		// if user is in Knights forumgroup tell him go away
 		if (isMember)
-			return res.status(403).json('403 Not authorized: Функционал подачи заявок Рыцарями пока не завершен');
+			return res.status(403).json('403 Not authorized: Подать заявку пока могут только Гости и Соратники');
 
 		async.series({
 			validateAreas: async.apply(validateAreas, req),
