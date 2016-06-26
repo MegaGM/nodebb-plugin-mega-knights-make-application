@@ -71,32 +71,23 @@ var saveApplications = function (req, callback) {
 		var topicData = temp.newTopics[choosenGame],
 			gameAreas = {};
 
-		async.each(req.body.areas, function (item, callback) {
+		async.each(req.body.areas, function (area, callback) {
 			// skip if it's a char related to another game or it's game choosing checkbox
-			var matchChar = item.id.match(config.gameCharRegexp),
-				matchCheckbox = item.id.match(config.gameCheckboxRegexp);
+			var matchChar = area.id.match(config.gameCharRegexp),
+				matchCheckbox = area.id.match(config.gameCheckboxRegexp);
 			if (matchChar && matchChar[1] !== choosenGame ||
 				matchCheckbox && matchCheckbox[1] !== choosenGame)
 				return callback(null);
 
-			gameAreas[item.id] = item.value;
+			gameAreas[area.id] = area.value;
 			callback(null);
 		}, function (err, results) {
-			let status = {
-				pending: true,
-				resolved: false,
-				rejected: false,
-				approved: false
-			};
-			let application = new require('./Application')(topicData.tid);
-			let now = Date.now();
-			application.setCreationTime(now);
+			let now = Date.now(),
+				application = new require('./Application')(topicData.tid);
 
-			async.parallel([
-				async.apply(db.setObject, config.redisKey + topicData.tid + ':application', gameAreas),
-				// async.apply(db.setObject, config.redisKey + topicData.tid + ':status', status),
-				async.apply(applicaion.pend, now)
-			], callback);
+			application.setCreationTime(now);
+			application.pend(now);
+			application.setAreas(gameAreas, callback);
 		});
 
 	}, callback);

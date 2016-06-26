@@ -12,11 +12,20 @@ module.exports = class Application {
 		};
 	}
 
-	setCreationTime(time, callback) {
+	setCreationTime(time) {
 		db.sortedSetAdd(config.redisKey + 'created', time, this.tid);
 	}
 
-	approve(time, callback) {
+	// TODO: test this method
+	getAreas(callback) {
+		db.getObject(config.redisKey + this.tid + ':application', callback);
+	}
+
+	setAreas(areas, callback) {
+		db.setObject(config.redisKey + this.tid + ':application', areas, callback);
+	}
+
+	approve(time) {
 		this.status.pending = false;
 		this.status.resolved = true;
 		this.status.approved = true;
@@ -28,7 +37,7 @@ module.exports = class Application {
 		db.setObject(config.redisKey + this.tid + ':status', this.status);
 	}
 
-	reject(time, callback) {
+	reject(time) {
 		this.status.pending = false;
 		this.status.resolved = true;
 		this.status.approved = false;
@@ -40,7 +49,7 @@ module.exports = class Application {
 		db.setObject(config.redisKey + this.tid + ':status', this.status);
 	}
 
-	pend(time, callback) {
+	pend(time) {
 		this.status.pending = true;
 		this.status.resolved = false;
 		this.status.approved = false;
@@ -52,7 +61,7 @@ module.exports = class Application {
 		db.setObject(config.redisKey + this.tid + ':status', this.status);
 	}
 
-	resolve(time, callback) {
+	resolve(time) {
 		this.status.pending = false;
 		this.status.resolved = true;
 		this.status.approved = false;
