@@ -50,10 +50,10 @@ var createTopics = function (req, callback) {
 		var topicData = {
 			// monkey patch to decieve NodeBB privilegies check
 			uid: 1,
-			// it will be reverted back to realUID in filter:parse.post hook
+			// it will be reverted back to realUID in filter:topic.post hook
 			realUID: req.uid,
 			cid: config.gameCids[choosenGame],
-			title: 'Заявка на вступление от ' + temp.username,
+			title: 'Заявка от ' + temp.username,
 			content: 'make-application placeholder',
 			tags: [choosenGame, 'Заявка'],
 			timestamp: Date.now()
