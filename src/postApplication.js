@@ -83,7 +83,7 @@ var saveApplications = function (req, callback) {
 			callback(null);
 		}, function (err, results) {
 			let now = Date.now(),
-				application = new require('./Application')(topicData.tid);
+				application = new(require('./Application'))(topicData.tid);
 
 			application.setCreationTime(now);
 			application.pend(now);
