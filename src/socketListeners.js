@@ -8,14 +8,16 @@ let socketListeners = {};
 /* ================================================
  * Dependencies
  * ===============================================*/
-let config = require('./config'),
+let
+	config = require('./config'),
 	_ = require('lodash'),
 	Promise = require('bluebird'),
 	db = require.main.require('./src/database/redis'),
 	groups = require.main.require('./src/groups'),
-	posts = require.main.require('./src/posts'),
 	topics = require.main.require('./src/topics'),
-	Handlebars = require('handlebars');
+	Application = require('./Application');
+
+let Handlebars = require('handlebars');
 require('../client/templates');
 
 /* ================================================
@@ -32,30 +34,31 @@ socketListeners.getSummary = (socket, data, callback) => {
 	console.log('getSummary', data);
 	if (!data || !data.tid) return callback(true, 'break');
 
-	let apl = null;
+	let a = null;
 	checkCid(data.tid)
 		.then(() => {
-			apl = new Application(data.tid);
+			a = new Application(data.tid);
 			return Promise.join(
-				apl.getStatus(),
-				apl.getVotes()
-				// dbGetObject(config.redisKey + data.tid + ':votes')
+				a.getStatus(),
+				a.getVotes(),
+				(status, votes) => {
+					console.log('status', status);
+					console.log('votes: ', votes);
+					// status = Handlebars.partials['application-status']({
+					// 	status
+					// });
+					return {
+						status,
+						votes
+					};
+				}
 			);
 		})
-		.spread((status, votes) => {
-			console.log('status', status);
-			console.log('votes: ', votes);
-			status = Handlebars.partials['application-status']({
-				status
-			});
-		})
 		.catch(catchBreak)
-		.then(breakIsAvoided => {
-			if (!breakIsAvoided) return;
-			callback(null, 'break')
-		})
-
-	callback(null);
+		.then(aData => {
+			if (!aData) return;
+			callback(null, aData);
+		});
 };
 
 socketListeners.getVotersPositive = (socket, data, callback) => {
@@ -88,7 +91,6 @@ socketListeners.getControls = (socket, data, callback) => {
  * Global helpers
  * ===============================================*/
 function checkCid(tid) {
-	// posts.getCidByPid(pid, callback);
 	// $('[data-index="0"]')
 	return getTopicField(tid, 'cid')
 		.then(cid => {

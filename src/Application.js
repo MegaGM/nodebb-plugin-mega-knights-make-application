@@ -49,14 +49,14 @@ module.exports = class Application {
 	}
 
 	getStatus() {
-		return dbGetObject(rKey + this.tid + ':status');
+		return getObject(rKey + this.tid + ':status');
 	}
 
 	getVotes() {
 		return Promise.join(
-			getSortedSetRevRangeWithScores(rKey + this.tid + ':votes' + ':positive'),
-			getSortedSetRevRangeWithScores(rKey + this.tid + ':votes' + ':negative'),
-			getSortedSetRevRangeWithScores(rKey + this.tid + ':votes' + ':jellyfish'),
+			getSortedSetRevRangeWithScores(rKey + this.tid + ':votes' + ':positive', 0, -1),
+			getSortedSetRevRangeWithScores(rKey + this.tid + ':votes' + ':negative', 0, -1),
+			getSortedSetRevRangeWithScores(rKey + this.tid + ':votes' + ':jellyfish', 0, -1),
 			(positive, negative, jellyfish) => {
 				return {
 					positive,
