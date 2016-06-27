@@ -32,32 +32,41 @@ function parseApplication(payload, callback) {
 	if (!token || token.tid != payload.postData.tid)
 		return callback(null, payload);
 
-	// TODO: make a filter for sensitive info based on req.uid's Рыцари group membership
-
 	let dbGetObject = Promise.promisify(db.getObject);
 
-	dbGetObject(config.redisKey + token.tid + ':application')
-		.then(areas => {
-			let personal = Handlebars.partials['personal-related']({
-				areas: areas
-			});
+	Promise.join(
+			dbGetObject(config.redisKey + token.tid + ':application'),
+			dbGetObject(config.redisKey + token.tid + ':status'),
+			(areas, status) => {
+				let personal = Handlebars.partials['personal-related']({
+					areas
+				});
 
-			let chars = getCharsHtmlFromAreas({
-				areas: areas,
-				token: token
-			}).join('\n');
+				let chars = getCharsHtmlFromAreas({
+					areas,
+					token
+				}).join('\n');
 
-			chars = Handlebars.partials['characters/' + token.game + '-charlist']({
-				chars: chars
-			});
+				let related = Handlebars.partials[token.game + '-related']({
+					areas,
+					chars
+				});
 
-			let output = Handlebars.templates['application-form-topic']({
-				personal: personal,
-				chars: chars
-			});
+				// TODO: debug
+				console.log(token);
+				status = Handlebars.partials['application-status']({
+					status,
+					token
+				});
 
-			return output;
-		})
+				let output = Handlebars.templates['application-form-topic']({
+					status,
+					personal,
+					related
+				});
+
+				return output;
+			})
 		.then(output => {
 			payload.postData.content = content.replace(config.tokenBBcodeRegexp, output);
 			callback(null, payload);
@@ -75,6 +84,7 @@ function getCharsHtmlFromAreas(data) {
 		})
 		.compact()
 		.uniq()
+		.sortBy(charI => charI)
 		.map(charI => {
 			let char = {};
 			char['charI'] = charI;
@@ -91,8 +101,8 @@ function getCharsHtmlFromAreas(data) {
 		})
 		.map(char => {
 			return Handlebars.partials['characters/' + token.game]({
-				charI: char.charI,
-				char: char
+				char,
+				charI: char.charI
 			});
 		})
 		.value();

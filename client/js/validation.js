@@ -124,7 +124,7 @@
 			'apb-char-level': {
 				'required': true
 			},
-			'apb-char-screenshot-url-lobby': {
+			'apb-screenshot-url-lobby': {
 				'required': true,
 				'sensitive': true,
 				'url': {

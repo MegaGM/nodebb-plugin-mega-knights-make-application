@@ -32,16 +32,22 @@
 
 		<div class="col-xs-12 col-md-4">
 			<div class="form-group">
-				<label for="apb-char-{charI}-screenshot-url-lobby">Скриншот меню выбора персонажей</label>
-				<br>{{! TODO: to hbs ifelse screenshot-placeholder }}
-				<div class="screenshot-placeholder">
-					<i class="icon fa fa-cloud-upload fa-3x"></i>
-					<input id="apb-char-{charI}-screenshot-url-lobby" class="screenshot-url" type="text">
+				<label for="apb-screenshot-url-lobby">Скриншот меню выбора персонажей</label>
+				<br>
+				{{#if areas}}
+					<a href="{{areas.apb-screenshot-url-lobby}}" target="_blank">
+						<div class="screenshot-placeholder no-border" style="background-image: url('{{areas.apb-screenshot-url-lobby}}')"></div>
+					</a>
+				{{else}}
+					<div class="screenshot-placeholder">
+						<i class="icon fa fa-cloud-upload fa-3x"></i>
+						<input id="apb-screenshot-url-lobby" class="screenshot-url" type="text">
 
-					<form class="screenshot-form" action="/api/post/upload" method="post" enctype="multipart/form-data">
-						<input class="screenshot-fileinput" type="file" name="files[]">
-					</form>
-				</div>
+						<form class="screenshot-form" action="/api/post/upload" method="post" enctype="multipart/form-data">
+							<input class="screenshot-fileinput" type="file" name="files[]">
+						</form>
+					</div>
+				{{/if}}
 			</div>
 
 		</div>

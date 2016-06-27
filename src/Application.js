@@ -7,10 +7,10 @@ module.exports = class Application {
 	constructor(tid) {
 		this.tid = tid;
 		this.status = {
-			pending: false,
-			resolved: false,
-			approved: false,
-			rejected: false
+			pending: 0,
+			resolved: 0,
+			approved: 0,
+			rejected: 0
 		};
 	}
 
@@ -28,10 +28,10 @@ module.exports = class Application {
 	}
 
 	approve(time) {
-		this.status.pending = false;
-		this.status.resolved = true;
-		this.status.approved = true;
-		this.status.rejected = false;
+		this.status.pending = 0;
+		this.status.resolved = time;
+		this.status.approved = time;
+		this.status.rejected = 0;
 		db.sortedSetRemove(config.redisKey + 'pending', this.tid);
 		db.sortedSetAdd(config.redisKey + 'resolved', time, this.tid);
 		db.sortedSetAdd(config.redisKey + 'approved', time, this.tid);
@@ -40,10 +40,10 @@ module.exports = class Application {
 	}
 
 	reject(time) {
-		this.status.pending = false;
-		this.status.resolved = true;
-		this.status.approved = false;
-		this.status.rejected = true;
+		this.status.pending = 0;
+		this.status.resolved = time;
+		this.status.approved = 0;
+		this.status.rejected = time;
 		db.sortedSetRemove(config.redisKey + 'pending', this.tid);
 		db.sortedSetAdd(config.redisKey + 'resolved', time, this.tid);
 		db.sortedSetRemove(config.redisKey + 'approved', this.tid);
@@ -52,10 +52,10 @@ module.exports = class Application {
 	}
 
 	pend(time) {
-		this.status.pending = true;
-		this.status.resolved = false;
-		this.status.approved = false;
-		this.status.rejected = false;
+		this.status.pending = time;
+		this.status.resolved = 0;
+		this.status.approved = 0;
+		this.status.rejected = 0;
 		db.sortedSetAdd(config.redisKey + 'pending', time, this.tid);
 		db.sortedSetRemove(config.redisKey + 'resolved', this.tid);
 		db.sortedSetRemove(config.redisKey + 'approved', this.tid);
@@ -64,10 +64,10 @@ module.exports = class Application {
 	}
 
 	resolve(time) {
-		this.status.pending = false;
-		this.status.resolved = true;
-		this.status.approved = false;
-		this.status.rejected = false;
+		this.status.pending = 0;
+		this.status.resolved = time;
+		this.status.approved = 0;
+		this.status.rejected = 0;
 		db.sortedSetRemove(config.redisKey + 'pending', this.tid);
 		db.sortedSetAdd(config.redisKey + 'resolved', time, this.tid);
 		db.sortedSetRemove(config.redisKey + 'approved', this.tid);
