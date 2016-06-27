@@ -37,6 +37,7 @@ function parseApplication(payload, callback) {
 	 * ===============================================*/
 	let dbGetObject = Promise.promisify(db.getObject);
 
+	// TODO: create new Application get areas and get status
 	Promise.join(
 			dbGetObject(config.redisKey + token.tid + ':application'),
 			dbGetObject(config.redisKey + token.tid + ':status'),
