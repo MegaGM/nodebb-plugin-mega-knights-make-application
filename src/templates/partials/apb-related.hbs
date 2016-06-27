@@ -10,7 +10,7 @@
 				<br>
 				{{#if areas}}
 					<div id="apb-previous-clans" class="form-control">
-						{{areas.apb-previous-clans}}
+						{{#fill areas.apb-previous-clans}}{{/fill}}
 					</div>
 				{{else}}
 					<input id="apb-previous-clans" class="form-control" type="text" placeholder="WASP, 8Bit, BitFenix">
@@ -22,7 +22,7 @@
 				<br>
 				{{#if areas}}
 					<div id="apb-leave-reasons" class="form-control">
-						{{areas.apb-leave-reasons}}
+						{{#fill areas.apb-leave-reasons}}{{/fill}}
 					</div>
 				{{else}}
 					<textarea id="apb-leave-reasons" class="form-control" rows="3" placeholder="WASP: проиграли на конкурсе MissAPB 1999 - я не стерпел. 8Bit: не понимаю английского языка, решил уйти. BitFenix: был конфликт с членами клана, неподелили грабящую серебряшку с $80k, я просил ребят дать её мне, а они ни в какую"></textarea>

@@ -32,7 +32,7 @@
 						<br>
 						{{#if char}}
 							<div id="apb-char-{{charI}}-renames" class="form-control">
-								{{char.apb-char-renames}}
+								{{#fill char.apb-char-renames}}{{/fill}}
 							</div>
 						{{else}}
 							<input id="apb-char-{{charI}}-renames" class="form-control" type="text" placeholder="ShiniDesu, Dopefish">
@@ -51,7 +51,7 @@
 						<br>
 						{{#if char}}
 							<div id="apb-char-{{charI}}-server" class="form-control">
-								{{char.apb-char-server}}
+								{{#capitalize char.apb-char-server}}{{/capitalize}}
 							</div>
 						{{else}}
 							<select id="apb-char-{{charI}}-server" class="form-control">
@@ -71,7 +71,7 @@
 						<br>
 						{{#if char}}
 							<div id="apb-char-{{charI}}-faction" class="form-control">
-								{{char.apb-char-faction}}
+								{{#capitalize char.apb-char-faction}}{{/capitalize}}
 							</div>
 						{{else}}
 							<select id="apb-char-{{charI}}-faction" class="form-control">
@@ -89,7 +89,7 @@
 						<br>
 						{{#if char}}
 							<div id="apb-char-{{charI}}-threat" class="form-control">
-								{{char.apb-char-threat}}
+								{{#capitalize char.apb-char-threat}}{{/capitalize}}
 							</div>
 						{{else}}
 							<select id="apb-char-{{charI}}-threat" class="form-control">
@@ -382,6 +382,7 @@
 		<div class="col-xs-12 col-md-4">
 			<div class="form-group inline-block">
 				<label for="apb-char-{{charI}}-screenshot-url-charstats">Скриншот статистики персонажа</label>
+				<br>
 				{{#if char}}
 					<a href="{{char.apb-char-screenshot-url-charstats}}" target="_blank">
 						<div class="screenshot-placeholder no-border" style="background-image: url('{{char.apb-char-screenshot-url-charstats}}')"></div>

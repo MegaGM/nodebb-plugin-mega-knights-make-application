@@ -7,7 +7,8 @@
 		"client/js/control-flow.js",
 		"client/js/local-storage.js",
 		"client/js/characters.js",
-		"client/js/screenshots.js"
+		"client/js/screenshots.js",
+		"client/js/intopic.js"
 	],
 	"less": ["src/less/styles.less"],
 	"templates": "src/nbb-templates",

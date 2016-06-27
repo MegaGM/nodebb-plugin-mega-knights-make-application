@@ -12,6 +12,11 @@ module.exports = class Application {
 			approved: 0,
 			rejected: 0
 		};
+		this.votes = {
+			pos: [],
+			neg: [],
+			jf: []
+		};
 	}
 
 	setCreationTime(time) {

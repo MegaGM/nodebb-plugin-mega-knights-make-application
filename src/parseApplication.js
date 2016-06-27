@@ -32,6 +32,9 @@ function parseApplication(payload, callback) {
 	if (!token || token.tid != payload.postData.tid)
 		return callback(null, payload);
 
+	/* ================================================
+	 * Promisify
+	 * ===============================================*/
 	let dbGetObject = Promise.promisify(db.getObject);
 
 	Promise.join(
@@ -52,8 +55,6 @@ function parseApplication(payload, callback) {
 					chars
 				});
 
-				// TODO: debug
-				console.log(token);
 				status = Handlebars.partials['application-status']({
 					status,
 					token

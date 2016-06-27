@@ -4,16 +4,22 @@
 	/* ---------------------------------------------
 	 * require dependencies
 	 * ---------------------------------------------*/
-	var nconf = require.main.require('nconf'),
+	let nconf = require.main.require('nconf'),
 		ensureLoggedIn = require.main.require('connect-ensure-login'),
+		SocketPlugins = require.main.require('./src/socket.io/plugins'),
+		socketListeners = require('./src/socketListeners'),
 		application = require('./src/application');
 
 	var Plugin = {
-		/* ---------------------------------------------
-		 * setup routes
-		 * ---------------------------------------------*/
 		init: function (params, callback) {
-			// get
+			/* ================================================
+			 * setup socket listeners
+			 * ===============================================*/
+			SocketPlugins.makeApplication = socketListeners;
+
+			/* ---------------------------------------------
+			 * setup GET routes
+			 * ---------------------------------------------*/
 			params.router.get('/make-application',
 				ensureLoggedIn.ensureLoggedIn(nconf.get('relative_path') + '/login'),
 				params.middleware.buildHeader,
@@ -23,11 +29,16 @@
 				ensureLoggedIn.ensureLoggedIn(nconf.get('relative_path') + '/login'),
 				application.getApplicationPage);
 
-			// post
+			/* ---------------------------------------------
+			 * setup POST routes
+			 * ---------------------------------------------*/
 			params.router.post('/make-application',
 				ensureLoggedIn.ensureLoggedIn(nconf.get('relative_path') + '/login'),
 				application.postApplicationPage);
 
+			/* ================================================
+			 * return control to NodeBB
+			 * ===============================================*/
 			callback(null);
 		},
 		revertUID: function (topicData, callback) {
