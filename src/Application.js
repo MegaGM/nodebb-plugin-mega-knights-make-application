@@ -5,6 +5,7 @@
  * ===============================================*/
 let
 	config = require('./config'),
+	rKey = config.redisKey,
 	Promise = require('bluebird'),
 	db = require.main.require('./src/database/redis');
 
@@ -15,7 +16,8 @@ let
 	getObject = Promise.promisify(db.getObject),
 	setObject = Promise.promisify(db.setObject),
 	sortedSetAdd = Promise.promisify(db.sortedSetAdd),
-	sortedSetRemove = Promise.promisify(db.sortedSetRemove);
+	sortedSetRemove = Promise.promisify(db.sortedSetRemove),
+	getSortedSetRevRangeWithScores = Promise.promisify(db.getSortedSetRevRangeWithScores);
 
 module.exports = class Application {
 	constructor(tid) {
@@ -34,16 +36,59 @@ module.exports = class Application {
 	}
 
 	setCreationTime(time) {
-		return sortedSetAdd(config.redisKey + 'created', time, this.tid);
+		return sortedSetAdd(rKey + 'created', time, this.tid);
 	}
 
 	// TODO: test this method
 	getAreas() {
-		return getObject(config.redisKey + this.tid + ':application');
+		return getObject(rKey + this.tid + ':application');
 	}
 
 	setAreas(areas) {
-		return setObject(config.redisKey + this.tid + ':application', areas);
+		return setObject(rKey + this.tid + ':application', areas);
+	}
+
+	getStatus() {
+		return dbGetObject(rKey + this.tid + ':status');
+	}
+
+	getVotes() {
+		return Promise.join(
+			getSortedSetRevRangeWithScores(rKey + this.tid + ':votes' + ':positive'),
+			getSortedSetRevRangeWithScores(rKey + this.tid + ':votes' + ':negative'),
+			getSortedSetRevRangeWithScores(rKey + this.tid + ':votes' + ':jellyfish'),
+			(positive, negative, jellyfish) => {
+				return {
+					positive,
+					negative,
+					jellyfish
+				};
+			}
+		);
+	}
+
+	votePositive(time, uid) {
+		return Promise.join(
+			sortedSetAdd(rKey + this.tid + ':votes' + ':positive', time, uid),
+			sortedSetRemove(rKey + this.tid + ':votes' + ':negative', uid),
+			sortedSetRemove(rKey + this.tid + ':votes' + ':jellyfish', uid)
+		);
+	}
+
+	voteNegative(time, uid) {
+		return Promise.join(
+			sortedSetRemove(rKey + this.tid + ':votes' + ':positive', uid),
+			sortedSetAdd(rKey + this.tid + ':votes' + ':negative', time, uid),
+			sortedSetRemove(rKey + this.tid + ':votes' + ':jellyfish', uid)
+		);
+	}
+
+	voteJellyfish(time, uid) {
+		return Promise.join(
+			sortedSetRemove(rKey + this.tid + ':votes' + ':positive', uid),
+			sortedSetRemove(rKey + this.tid + ':votes' + ':negative', uid),
+			sortedSetAdd(rKey + this.tid + ':votes' + ':jellyfish', time, uid)
+		);
 	}
 
 	approve(time) {
@@ -53,11 +98,11 @@ module.exports = class Application {
 		this.status.rejected = 0;
 
 		return Promise.join(
-			sortedSetRemove(config.redisKey + 'pending', this.tid),
-			sortedSetAdd(config.redisKey + 'resolved', time, this.tid),
-			sortedSetAdd(config.redisKey + 'approved', time, this.tid),
-			sortedSetRemove(config.redisKey + 'rejected', this.tid),
-			setObject(config.redisKey + this.tid + ':status', this.status)
+			sortedSetRemove(rKey + 'pending', this.tid),
+			sortedSetAdd(rKey + 'resolved', time, this.tid),
+			sortedSetAdd(rKey + 'approved', time, this.tid),
+			sortedSetRemove(rKey + 'rejected', this.tid),
+			setObject(rKey + this.tid + ':status', this.status)
 		);
 	}
 
@@ -68,11 +113,11 @@ module.exports = class Application {
 		this.status.rejected = time;
 
 		return Promise.join(
-			sortedSetRemove(config.redisKey + 'pending', this.tid),
-			sortedSetAdd(config.redisKey + 'resolved', time, this.tid),
-			sortedSetRemove(config.redisKey + 'approved', this.tid),
-			sortedSetAdd(config.redisKey + 'rejected', time, this.tid),
-			setObject(config.redisKey + this.tid + ':status', this.status)
+			sortedSetRemove(rKey + 'pending', this.tid),
+			sortedSetAdd(rKey + 'resolved', time, this.tid),
+			sortedSetRemove(rKey + 'approved', this.tid),
+			sortedSetAdd(rKey + 'rejected', time, this.tid),
+			setObject(rKey + this.tid + ':status', this.status)
 		);
 	}
 
@@ -83,11 +128,11 @@ module.exports = class Application {
 		this.status.rejected = 0;
 
 		return Promise.join(
-			sortedSetAdd(config.redisKey + 'pending', time, this.tid),
-			sortedSetRemove(config.redisKey + 'resolved', this.tid),
-			sortedSetRemove(config.redisKey + 'approved', this.tid),
-			sortedSetRemove(config.redisKey + 'rejected', this.tid),
-			setObject(config.redisKey + this.tid + ':status', this.status)
+			sortedSetAdd(rKey + 'pending', time, this.tid),
+			sortedSetRemove(rKey + 'resolved', this.tid),
+			sortedSetRemove(rKey + 'approved', this.tid),
+			sortedSetRemove(rKey + 'rejected', this.tid),
+			setObject(rKey + this.tid + ':status', this.status)
 		);
 	}
 
@@ -98,11 +143,11 @@ module.exports = class Application {
 		this.status.rejected = 0;
 
 		return Promise.join(
-			sortedSetRemove(config.redisKey + 'pending', this.tid),
-			sortedSetAdd(config.redisKey + 'resolved', time, this.tid),
-			sortedSetRemove(config.redisKey + 'approved', this.tid),
-			sortedSetRemove(config.redisKey + 'rejected', this.tid),
-			setObject(config.redisKey + this.tid + ':status', this.status)
+			sortedSetRemove(rKey + 'pending', this.tid),
+			sortedSetAdd(rKey + 'resolved', time, this.tid),
+			sortedSetRemove(rKey + 'approved', this.tid),
+			sortedSetRemove(rKey + 'rejected', this.tid),
+			setObject(rKey + this.tid + ':status', this.status)
 		);
 	}
 }

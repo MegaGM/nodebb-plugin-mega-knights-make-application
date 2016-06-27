@@ -32,11 +32,14 @@ socketListeners.getSummary = (socket, data, callback) => {
 	console.log('getSummary', data);
 	if (!data || !data.tid) return callback(true, 'break');
 
+	let apl = null;
 	checkCid(data.tid)
 		.then(() => {
+			apl = new Application(data.tid);
 			return Promise.join(
-				dbGetObject(config.redisKey + data.tid + ':status'),
-				dbGetObject(config.redisKey + data.tid + ':votes')
+				apl.getStatus(),
+				apl.getVotes()
+				// dbGetObject(config.redisKey + data.tid + ':votes')
 			);
 		})
 		.spread((status, votes) => {
