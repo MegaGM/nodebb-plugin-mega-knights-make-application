@@ -62,8 +62,8 @@ socketListeners.vote = (socket, data, callback) => {
 	uid = data.uid;
 
 	a['vote' + type](now, uid)
-		.then(() => {
-			callback(null, data);
+		.then(votesSummary => {
+			callback(null, votesSummary);
 		});
 };
 

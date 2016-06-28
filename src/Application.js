@@ -56,17 +56,25 @@ module.exports = class Application {
 	}
 
 	getVotesSummary() {
-		// TODO: if not votes summary, calculate them
-		return getObject(rKey + this.tid + ':votes' + ':summary');
+		return getObject(rKey + this.tid + ':votes' + ':summary')
+			.then(votesSummary => {
+				if (!votesSummary)
+					return this.calculateVotesSummary();
+				return votesSummary;
+			})
 	}
 
 	calculateVotesSummary() {
+		// TODO: debug
+		let start = Date.now();
 		let
 			votes,
 			uids = [],
 			memberOf = {},
+			uidMultipliers = {},
 			groupNames = config.groupNames;
-		this.getVotes()
+
+		return this.getVotes()
 			.then(_votes => {
 				votes = _votes;
 				// pick uids
@@ -80,26 +88,63 @@ module.exports = class Application {
 			.then(() => {
 				// TODO: debug
 				console.log('uids: ', uids);
-				Promise
+				return Promise
 					.map(groupNames, groupName => {
+						// get an array of membership lists
 						return isMembersOfGroup(uids, groupName);
 					})
-					.then(groupMembersListArr => {
-						return _.each(groupMembersListArr, (groupMembersList, groupI) => {
-							// TODO: debug
-							console.log('groupMembersList: ', groupMembersList);
-							return _.each(groupMembersList, (isMember, uidI) => {
-								if (!memberOf[groupNames[groupI]])
-									memberOf[groupNames[groupI]] = {};
-								memberOf[groupNames[groupI]][uids[uidI]] = isMember;
-							});
-						});
-					})
-					.then(what => {
-						console.log('what: ', what);
-						console.log('memberOf: ', memberOf);
-					})
 			})
+			.then(membershipLists => {
+				// compute memberOf hash
+				return _.each(membershipLists, (membershipList, groupI) => {
+					// TODO: debug
+					console.log('membershipList: ', membershipList);
+					return _.each(membershipList, (isMember, uidI) => {
+						if (!memberOf[groupNames[groupI]])
+							memberOf[groupNames[groupI]] = {};
+						memberOf[groupNames[groupI]][uids[uidI]] = isMember;
+					});
+				});
+			})
+			.then(() => {
+				// TODO: debug
+				console.log('memberOf: ', memberOf);
+				// compute vote multiplier
+				return _.each(uids, uid => {
+					let multiplier = 0;
+					_.each(groupNames, groupName => {
+						if (memberOf[groupName][uid])
+							multiplier = config.voteMultipliers[groupName];
+					});
+					uidMultipliers[uid] = multiplier;
+				});
+			})
+			.then(() => {
+				// TODO: debug
+				console.log('uidMultipliers: ', uidMultipliers);
+				// compute multiplied votes
+				return Promise
+					.map(Object.keys(votes), typeKey => {
+						let voters = votes[typeKey];
+						return Promise.reduce(voters, (total, vote) => {
+							let uid = vote.value;
+							return total + (1 * uidMultipliers[uid]);
+						}, 0)
+					})
+					.spread((positive, negative, jellyfish) => {
+						return {
+							positive,
+							negative,
+							jellyfish
+						};
+					});
+			})
+			.then(multipliedVotes => {
+				// TODO: debug
+				console.log('multipliedVotes: ', multipliedVotes);
+				console.log('last chain in calculateVotesSummary: ', Date.now() - start);
+				return multipliedVotes;
+			});
 	}
 
 	getVotes() {
@@ -122,7 +167,10 @@ module.exports = class Application {
 			sortedSetAdd(rKey + this.tid + ':votes' + ':positive', time, uid),
 			sortedSetRemove(rKey + this.tid + ':votes' + ':negative', uid),
 			sortedSetRemove(rKey + this.tid + ':votes' + ':jellyfish', uid),
-			this.calculateVotesSummary.bind(this)
+			this.calculateVotesSummary(),
+			(a, b, c, votesSummary) => {
+				return votesSummary;
+			}
 		);
 	}
 
@@ -131,7 +179,11 @@ module.exports = class Application {
 			sortedSetRemove(rKey + this.tid + ':votes' + ':positive', uid),
 			sortedSetAdd(rKey + this.tid + ':votes' + ':negative', time, uid),
 			sortedSetRemove(rKey + this.tid + ':votes' + ':jellyfish', uid),
-			this.calculateVotesSummary.bind(this)
+			this.calculateVotesSummary(),
+			(a, b, c, votesSummary) => {
+				console.log('vote negative: ', a, b, c, votesSummary);
+				return votesSummary;
+			}
 		);
 	}
 
@@ -140,7 +192,10 @@ module.exports = class Application {
 			sortedSetRemove(rKey + this.tid + ':votes' + ':positive', uid),
 			sortedSetRemove(rKey + this.tid + ':votes' + ':negative', uid),
 			sortedSetAdd(rKey + this.tid + ':votes' + ':jellyfish', time, uid),
-			this.calculateVotesSummary.bind(this)
+			this.calculateVotesSummary(),
+			(a, b, c, votesSummary) => {
+				return votesSummary;
+			}
 		);
 	}
 
@@ -204,3 +259,5 @@ module.exports = class Application {
 		);
 	}
 }
+
+function getVoteMultiplier() {}

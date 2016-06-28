@@ -18,6 +18,13 @@ var config = {
 		'Генералы',
 		'Лидер'
 	],
+	voteMultipliers: {
+		'Рыцари': 1,
+		'Рекрутеры': 10,
+		'Офицеры': 30,
+		'Генералы': 75,
+		'Лидер': 1
+	},
 	gameCheckboxRegexp: /i-choose-(\w{3})/i,
 	gameCharRegexp: /(\w{3})-char-(\d+)/i,
 	tokenBBcodeRegexp: /\[application-hash\=\@([^"]+)\@\]/i,
