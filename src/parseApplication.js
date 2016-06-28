@@ -40,7 +40,7 @@ function parseApplication(payload, callback) {
 	// TODO: create new Application get areas and get status
 	Promise.join(
 			dbGetObject(config.redisKey + token.tid + ':application'),
-			dbGetObject(config.redisKey + token.tid + ':status'),
+			// dbGetObject(config.redisKey + token.tid + ':status'),
 			(areas, status) => {
 				let personal = Handlebars.partials['personal-related']({
 					areas
@@ -56,10 +56,10 @@ function parseApplication(payload, callback) {
 					chars
 				});
 
-				status = Handlebars.partials['application-status']({
-					status,
-					token
-				});
+				// status = Handlebars.partials['application-status']({
+				// 	status,
+				// 	token
+				// });
 
 				let output = Handlebars.templates['application-form-topic']({
 					status,

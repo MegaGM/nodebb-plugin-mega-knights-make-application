@@ -8,9 +8,7 @@ $(document).on('ready', function (e) {
 		var el = $(e.target),
 			game = el.closest('[data-game]').attr('data-game');
 
-		var modulePath = '../../plugins/nodebb-plugin-mega-knights-make-application/',
-			bundlePath = modulePath + 'templates/index.js';
-		require(['handlebars', bundlePath], function (Handlebars) {
+		require(['handlebars', 'make-application/templates'], function (Handlebars) {
 			var html = Handlebars.partials['characters/' + game]({
 				charI: ++charI
 			});

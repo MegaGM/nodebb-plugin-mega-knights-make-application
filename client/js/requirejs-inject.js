@@ -13,6 +13,7 @@
 	registerAMD('localStorage', 'js/lib/store.min');
 	registerAMD('validator', 'js/lib/validator.min');
 	registerAMD('validation', 'js/validation');
+	registerAMD('templates', 'templates/index');
 
 	// Handlebars is an exception! Let it register without any namespace, if it wasn't already registered
 	if (!rjsConfig.paths['handlebars'])

@@ -5,14 +5,17 @@
  * ===============================================*/
 let
 	config = require('./config'),
+	_ = require('lodash'),
 	rKey = config.redisKey,
 	Promise = require('bluebird'),
-	db = require.main.require('./src/database/redis');
+	db = require.main.require('./src/database/redis'),
+	groups = require.main.require('./src/groups');
 
 /* ================================================
  * Promisify
  * ===============================================*/
 let
+	isMembersOfGroup = Promise.promisify(groups.isMembers),
 	getObject = Promise.promisify(db.getObject),
 	setObject = Promise.promisify(db.setObject),
 	sortedSetAdd = Promise.promisify(db.sortedSetAdd),
@@ -52,6 +55,53 @@ module.exports = class Application {
 		return getObject(rKey + this.tid + ':status');
 	}
 
+	getVotesSummary() {
+		// TODO: if not votes summary, calculate them
+		return getObject(rKey + this.tid + ':votes' + ':summary');
+	}
+
+	calculateVotesSummary() {
+		let
+			votes,
+			uids = [],
+			memberOf = {},
+			groupNames = config.groupNames;
+		this.getVotes()
+			.then(_votes => {
+				votes = _votes;
+				// pick uids
+				return _.each(votes, type => {
+					_.each(type, vote => {
+						let uid = vote.value;
+						uids.push(uid);
+					});
+				});
+			})
+			.then(() => {
+				// TODO: debug
+				console.log('uids: ', uids);
+				Promise
+					.map(groupNames, groupName => {
+						return isMembersOfGroup(uids, groupName);
+					})
+					.then(groupMembersListArr => {
+						return _.each(groupMembersListArr, (groupMembersList, groupI) => {
+							// TODO: debug
+							console.log('groupMembersList: ', groupMembersList);
+							return _.each(groupMembersList, (isMember, uidI) => {
+								if (!memberOf[groupNames[groupI]])
+									memberOf[groupNames[groupI]] = {};
+								memberOf[groupNames[groupI]][uids[uidI]] = isMember;
+							});
+						});
+					})
+					.then(what => {
+						console.log('what: ', what);
+						console.log('memberOf: ', memberOf);
+					})
+			})
+	}
+
 	getVotes() {
 		return Promise.join(
 			getSortedSetRevRangeWithScores(rKey + this.tid + ':votes' + ':positive', 0, -1),
@@ -71,7 +121,8 @@ module.exports = class Application {
 		return Promise.join(
 			sortedSetAdd(rKey + this.tid + ':votes' + ':positive', time, uid),
 			sortedSetRemove(rKey + this.tid + ':votes' + ':negative', uid),
-			sortedSetRemove(rKey + this.tid + ':votes' + ':jellyfish', uid)
+			sortedSetRemove(rKey + this.tid + ':votes' + ':jellyfish', uid),
+			this.calculateVotesSummary.bind(this)
 		);
 	}
 
@@ -79,7 +130,8 @@ module.exports = class Application {
 		return Promise.join(
 			sortedSetRemove(rKey + this.tid + ':votes' + ':positive', uid),
 			sortedSetAdd(rKey + this.tid + ':votes' + ':negative', time, uid),
-			sortedSetRemove(rKey + this.tid + ':votes' + ':jellyfish', uid)
+			sortedSetRemove(rKey + this.tid + ':votes' + ':jellyfish', uid),
+			this.calculateVotesSummary.bind(this)
 		);
 	}
 
@@ -87,7 +139,8 @@ module.exports = class Application {
 		return Promise.join(
 			sortedSetRemove(rKey + this.tid + ':votes' + ':positive', uid),
 			sortedSetRemove(rKey + this.tid + ':votes' + ':negative', uid),
-			sortedSetAdd(rKey + this.tid + ':votes' + ':jellyfish', time, uid)
+			sortedSetAdd(rKey + this.tid + ':votes' + ':jellyfish', time, uid),
+			this.calculateVotesSummary.bind(this)
 		);
 	}
 

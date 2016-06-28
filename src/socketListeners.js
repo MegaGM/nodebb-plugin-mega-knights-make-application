@@ -29,6 +29,44 @@ let dbGetObject = Promise.promisify(db.getObject),
 /* ================================================
  * Module methods
  * ===============================================*/
+socketListeners.test = (socket, data, callback) => {
+	let a = new Application(data.tid);
+	a.calculateVotesSummary();
+	callback(null, 'meow');
+};
+
+socketListeners.vote = (socket, data, callback) => {
+	// check data integrity
+	if (!data || !data.type || !data.tid)
+		return callback(true, 'invalid data');
+
+	// if anon
+	let
+		type = data.type,
+		uid = parseInt(socket.uid),
+		tid = parseInt(data.tid);
+	if (!uid || !tid)
+		return callback(true, 'invalid tid');
+
+	// check Capitalized data.type
+	let whitelist = ['Positive', 'Negative', 'Jellyfish'];
+	type = ('string' === typeof data.type) ?
+		type.charAt(0).toUpperCase() + type.slice(1) : false;
+	if (-1 === whitelist.indexOf(type))
+		return callback(true, 'invalid type');
+
+	let a = new Application(tid),
+		now = Date.now();
+
+	// TODO: stub
+	uid = data.uid;
+
+	a['vote' + type](now, uid)
+		.then(() => {
+			callback(null, data);
+		});
+};
+
 socketListeners.getSummary = (socket, data, callback) => {
 	// TODO: debug
 	console.log('getSummary', data);
@@ -44,9 +82,6 @@ socketListeners.getSummary = (socket, data, callback) => {
 				(status, votes) => {
 					console.log('status', status);
 					console.log('votes: ', votes);
-					// status = Handlebars.partials['application-status']({
-					// 	status
-					// });
 					return {
 						status,
 						votes
@@ -55,9 +90,9 @@ socketListeners.getSummary = (socket, data, callback) => {
 			);
 		})
 		.catch(catchBreak)
-		.then(aData => {
-			if (!aData) return;
-			callback(null, aData);
+		.then(summary => {
+			if (!summary) return callback(true, 'break');
+			callback(null, summary);
 		});
 };
 
@@ -91,7 +126,6 @@ socketListeners.getControls = (socket, data, callback) => {
  * Global helpers
  * ===============================================*/
 function checkCid(tid) {
-	// $('[data-index="0"]')
 	return getTopicField(tid, 'cid')
 		.then(cid => {
 			return _.some(config.gameCids, gameCid => cid == gameCid);

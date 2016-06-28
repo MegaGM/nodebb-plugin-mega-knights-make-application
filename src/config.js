@@ -11,6 +11,13 @@ var config = {
 		bns: 22,
 		gta: 9
 	},
+	groupNames: [
+		'Рыцари',
+		'Рекрутеры',
+		'Офицеры',
+		'Генералы',
+		'Лидер'
+	],
 	gameCheckboxRegexp: /i-choose-(\w{3})/i,
 	gameCharRegexp: /(\w{3})-char-(\d+)/i,
 	tokenBBcodeRegexp: /\[application-hash\=\@([^"]+)\@\]/i,
