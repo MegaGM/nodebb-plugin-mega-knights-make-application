@@ -1,6 +1,23 @@
-var nbbHelpers = require.main.require('./src/controllers/helpers');
+'use strict';
 
-var config = {
+let nbbHelpers = require.main.require('./src/controllers/helpers');
+
+let // logger
+	log4js = require('log4js'),
+	logOptions = {
+		replaceConsole: true,
+		appenders: [{
+			type: 'console',
+			layout: {
+				type: 'pattern',
+				pattern: '%d{ABSOLUTE} %[%c.%p%] - %m'
+			}
+		}]
+	};
+log4js.configure(logOptions);
+
+let config = {
+	logOptions: logOptions,
 	title: 'Создать заявку',
 	breadcrumbs: nbbHelpers.buildBreadcrumbs([{
 		text: 'Создать заявку'

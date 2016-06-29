@@ -3,13 +3,18 @@
 /* ================================================
  * Dependencies
  * ===============================================*/
-let
+let // local
 	config = require('./config'),
+	rKey = config.redisKey;
+let // npm
 	_ = require('lodash'),
-	rKey = config.redisKey,
-	Promise = require('bluebird'),
+	Promise = require('bluebird');
+let // NodeBB
 	db = require.main.require('./src/database/redis'),
 	groups = require.main.require('./src/groups');
+let // logger
+	log4js = require('log4js'),
+	log = log4js.getLogger('Application');
 
 /* ================================================
  * Promisify
@@ -31,11 +36,6 @@ module.exports = class Application {
 			approved: 0,
 			rejected: 0
 		};
-		this.votes = {
-			pos: [],
-			neg: [],
-			jf: []
-		};
 	}
 
 	setCreationTime(time) {
@@ -55,12 +55,12 @@ module.exports = class Application {
 		return getObject(rKey + this.tid + ':status');
 	}
 
-	getVotesSummary() {
-		return getObject(rKey + this.tid + ':votes' + ':summary')
-			.then(votesSummary => {
-				if (!votesSummary)
+	getSummary() {
+		return getObject(rKey + this.tid + ':summary')
+			.then(summary => {
+				if (!summary)
 					return this.calculateVotesSummary();
-				return votesSummary;
+				return summary;
 			})
 	}
 
@@ -87,7 +87,7 @@ module.exports = class Application {
 			})
 			.then(() => {
 				// TODO: debug
-				console.log('uids: ', uids);
+				log.debug('uids: \n', uids);
 				return Promise
 					.map(groupNames, groupName => {
 						// get an array of membership lists
@@ -98,7 +98,7 @@ module.exports = class Application {
 				// compute memberOf hash
 				return _.each(membershipLists, (membershipList, groupI) => {
 					// TODO: debug
-					console.log('membershipList: ', membershipList);
+					log.debug('membershipList: \n', membershipList);
 					return _.each(membershipList, (isMember, uidI) => {
 						if (!memberOf[groupNames[groupI]])
 							memberOf[groupNames[groupI]] = {};
@@ -108,7 +108,7 @@ module.exports = class Application {
 			})
 			.then(() => {
 				// TODO: debug
-				console.log('memberOf: ', memberOf);
+				log.debug('memberOf: \n', memberOf);
 				// compute vote multiplier
 				return _.each(uids, uid => {
 					let multiplier = 0;
@@ -121,7 +121,7 @@ module.exports = class Application {
 			})
 			.then(() => {
 				// TODO: debug
-				console.log('uidMultipliers: ', uidMultipliers);
+				log.debug('uidMultipliers: \n', uidMultipliers);
 				// compute multiplied votes
 				return Promise
 					.map(Object.keys(votes), typeKey => {
@@ -141,9 +141,12 @@ module.exports = class Application {
 			})
 			.then(multipliedVotes => {
 				// TODO: debug
-				console.log('multipliedVotes: ', multipliedVotes);
-				console.log('last chain in calculateVotesSummary: ', Date.now() - start);
-				return multipliedVotes;
+				log.debug('multipliedVotes\n', multipliedVotes);
+				// TODO: debug
+				log.debug('last chain in calculateVotesSummary: \n', Date.now() - start);
+
+				return setObject(rKey + this.tid + ':summary', multipliedVotes)
+					.thenReturn(multipliedVotes);
 			});
 	}
 
@@ -181,7 +184,7 @@ module.exports = class Application {
 			sortedSetRemove(rKey + this.tid + ':votes' + ':jellyfish', uid),
 			this.calculateVotesSummary(),
 			(a, b, c, votesSummary) => {
-				console.log('vote negative: ', a, b, c, votesSummary);
+				log.debug('vote negative: \n', a, b, c, votesSummary);
 				return votesSummary;
 			}
 		);

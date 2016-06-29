@@ -17,7 +17,12 @@ let
 	topics = require.main.require('./src/topics'),
 	Application = require('./Application');
 
-let Handlebars = require('handlebars');
+let // logger
+	log4js = require('log4js'),
+	log = log4js.getLogger('socketListeners');
+
+let // templates
+	Handlebars = require('handlebars');
 require('../client/templates');
 
 /* ================================================
@@ -69,8 +74,8 @@ socketListeners.vote = (socket, data, callback) => {
 
 socketListeners.getSummary = (socket, data, callback) => {
 	// TODO: debug
-	console.log('getSummary', data);
-	if (!data || !data.tid) return callback(true, 'break');
+	log.debug('getSummary\n', data);
+	if (!data || !data.tid) return callback(true, 'invalid data');
 
 	let a = null;
 	checkCid(data.tid)
@@ -78,10 +83,10 @@ socketListeners.getSummary = (socket, data, callback) => {
 			a = new Application(data.tid);
 			return Promise.join(
 				a.getStatus(),
-				a.getVotes(),
+				a.getSummary(),
 				(status, votes) => {
-					console.log('status', status);
-					console.log('votes: ', votes);
+					log.debug('status\n', status);
+					log.debug('votes: \n', votes);
 					return {
 						status,
 						votes
@@ -98,25 +103,25 @@ socketListeners.getSummary = (socket, data, callback) => {
 
 socketListeners.getVotersPositive = (socket, data, callback) => {
 	// TODO: debug
-	console.log('getVotes', data);
+	log.debug('getVotes\n', data);
 	callback(null);
 };
 
 socketListeners.getVotersNegative = (socket, data, callback) => {
 	// TODO: debug
-	console.log('getVotes', data);
+	log.debug('getVotes\n', data);
 	callback(null);
 };
 
 socketListeners.getVotersJellyfish = (socket, data, callback) => {
 	// TODO: debug
-	console.log('getVotes', data);
+	log.debug('getVotes\n', data);
 	callback(null);
 };
 
 socketListeners.getControls = (socket, data, callback) => {
 	// TODO: debug
-	console.log('getControls', data);
+	log.debug('getControls\n', data);
 	callback(null, {
 		answer: 'meow!'
 	});

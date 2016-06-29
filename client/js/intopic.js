@@ -21,10 +21,10 @@
 			console.log(err, summary);
 			if ('break' === summary || err) return;
 
+			setupTooltips();
 			require(['handlebars', 'make-application/templates'], function (Handlebars) {
-				var html = Handlebars.partials['application-summary'](summary);
-				$('.application-summary').html(html);
-				setupTooltips();
+				var html = Handlebars.partials['application-status'](summary);
+				$('.application-status').html(html);
 			});
 		});
 	}

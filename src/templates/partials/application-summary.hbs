@@ -1,26 +1,18 @@
-<div class="application-status">
-	Статус:
-	{{#if status.pending}}
-		<span class="pending">в рассмотрении</span>
-		<span class="timeago" title="{{#datetime status.pending}}{{/datetime}}"></span>
-		{{else if status.approved}}
-		<span class="approved">одобрено</span>
-		{{else if status.rejected}}
-		<span class="rejected">отказано</span>
-		{{else if status.resolved}}
-		<span class="resolved">закрыто</span>
-	{{/if}}
-</div>
-<div class="application-votes">
-	<div class="progress">
-		<div class="progress-bar progress-bar-success" style="width: 72%" data-toggle="tooltip" title="проголосовали ЗА">
-			<span class="no-select">72%</span>
-		</div>
-		<div class="progress-bar progress-bar-gray" style="width: 8%" data-toggle="tooltip" title="воздержались от голосования">
-			<span class="no-select">8%</span>
-		</div>
-		<div class="progress-bar progress-bar-danger" style="width: 20%" data-toggle="tooltip" title="проголосовали ПРОТИВ">
-			<span class="no-select">20%</span>
+<div class="application-summary">
+	<div class="application-status">
+		{{> application-status }}
+	</div>
+	<div class="application-votes">
+		<div class="progress">
+			<div class="progress-bar progress-bar-success" style="width: 45%" data-toggle="tooltip" title="проголосовали ЗА">
+				<span class="percents no-select"></span>
+			</div>
+			<div class="progress-bar progress-bar-gray" style="width: 10%" data-toggle="tooltip" title="воздержались от голосования">
+				<span class="percents no-select"></span>
+			</div>
+			<div class="progress-bar progress-bar-danger" style="width: 45%" data-toggle="tooltip" title="проголосовали ПРОТИВ">
+				<span class="percents no-select"></span>
+			</div>
 		</div>
 	</div>
 </div>

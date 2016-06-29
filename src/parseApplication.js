@@ -6,25 +6,30 @@ let config = require('./config'),
 	async = require.main.require('async'),
 	db = require.main.require('./src/database/redis'),
 	groups = require.main.require('./src/groups'),
+	Application = require('./Application'),
 	validation = require('../client/js/validation');
 
 let Handlebars = require('handlebars');
 require('../client/templates');
 
 /* ================================================
- * plugin for parsing application BBcode
+ * plugin for parsing BBcode of an application
  * ===============================================*/
 function parseApplication(payload, callback) {
+	/* ================================================
+	 * Checks
+	 * ===============================================*/
 	if (!payload || !payload.postData || !payload.postData.content)
 		return callback(null, payload);
 
-	var match,
+	let match,
 		content = payload.postData.content;
 	if (!(match = content.match(config.tokenBBcodeRegexp)))
 		return callback(null, payload);
 
+	let token = null;
 	try {
-		var token = jwt.verify(match[1], config.jwtSecret);
+		token = jwt.verify(match[1], config.jwtSecret);
 	} catch (e) {
 		return callback(null, payload);
 	}
@@ -33,42 +38,26 @@ function parseApplication(payload, callback) {
 		return callback(null, payload);
 
 	/* ================================================
-	 * Promisify
+	 * Parse templates and replace BBcode with html
 	 * ===============================================*/
-	let dbGetObject = Promise.promisify(db.getObject);
-
-	// TODO: create new Application get areas and get status
-	Promise.join(
-			dbGetObject(config.redisKey + token.tid + ':application'),
-			// dbGetObject(config.redisKey + token.tid + ':status'),
-			(areas, status) => {
-				let personal = Handlebars.partials['personal-related']({
+	let a = new Application(token.tid);
+	a.getAreas()
+		.then(areas => {
+			// render application for topic
+			return Handlebars.templates['application-form-topic']({
+				summary: Handlebars.partials['application-summary'](),
+				personal: Handlebars.partials['personal-related']({
 					areas
-				});
-
-				let chars = getCharsHtmlFromAreas({
+				}),
+				related: Handlebars.partials[token.game + '-related']({
 					areas,
-					token
-				}).join('\n');
-
-				let related = Handlebars.partials[token.game + '-related']({
-					areas,
-					chars
-				});
-
-				// status = Handlebars.partials['application-status']({
-				// 	status,
-				// 	token
-				// });
-
-				let output = Handlebars.templates['application-form-topic']({
-					status,
-					personal,
-					related
-				});
-
-				return output;
-			})
+					chars: getCharsHtmlFromAreas({
+						areas,
+						token
+					}).join('\n')
+				})
+			});
+		})
 		.then(output => {
 			payload.postData.content = content.replace(config.tokenBBcodeRegexp, output);
 			callback(null, payload);
