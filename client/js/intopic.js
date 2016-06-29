@@ -2,6 +2,10 @@
 	// $(document).on('ready', initiateApplicationInTopic);
 	$(window).on('action:ajaxify.end', initiateApplicationInTopic);
 
+	socket.on('plugins.makeApplication.event.getSummary', function (data) {
+		getSummary(data.tid);
+	});
+
 	$(document).on('click', '.application-controls [data-vote]', function (e) {
 		var el = $(e.target),
 			type = el.attr('data-vote'),
@@ -15,8 +19,9 @@
 			tid: tid,
 			type: type
 		}, function (err, summary) {
+			console.log('vote callback', err, summary);
 			if ('break' === summary || err) return;
-			getSummary(tid);
+			// getSummary(tid);
 		});
 	}
 

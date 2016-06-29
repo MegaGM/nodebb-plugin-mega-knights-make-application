@@ -14,6 +14,7 @@ let
 	Promise = require('bluebird'),
 	db = require.main.require('./src/database/redis'),
 	groups = require.main.require('./src/groups'),
+	SocketIndex = require.main.require('./src/socket.io/index'),
 	topics = require.main.require('./src/topics'),
 	Application = require('./Application');
 
@@ -63,12 +64,12 @@ socketListeners.vote = (socket, data, callback) => {
 	let a = new Application(tid),
 		now = Date.now();
 
-	// TODO: stub
-	uid = data.uid;
-
 	a['vote' + type](now, uid)
 		.then(() => {
 			callback(null);
+			SocketIndex.server.sockets.emit('plugins.makeApplication.event.getSummary', {
+				tid
+			});
 		});
 };
 
