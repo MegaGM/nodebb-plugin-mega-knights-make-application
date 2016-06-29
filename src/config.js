@@ -16,7 +16,8 @@ let // logger
 	};
 log4js.configure(logOptions);
 
-let config = {
+let // actual config
+	config = {
 	logOptions: logOptions,
 	title: 'Создать заявку',
 	breadcrumbs: nbbHelpers.buildBreadcrumbs([{
@@ -28,7 +29,7 @@ let config = {
 		bns: 22,
 		gta: 9
 	},
-	groupNames: [
+	groupNames: [ // should be in asc
 		'Рыцари',
 		'Рекрутеры',
 		'Офицеры',

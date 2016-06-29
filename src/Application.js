@@ -10,7 +10,7 @@ let // npm
 	_ = require('lodash'),
 	Promise = require('bluebird');
 let // NodeBB
-	db = require.main.require('./src/database/redis'),
+	db = require.main.require('./src/database'),
 	groups = require.main.require('./src/groups');
 let // logger
 	log4js = require('log4js'),
@@ -20,6 +20,7 @@ let // logger
  * Promisify
  * ===============================================*/
 let
+	isMemberOfGroups = Promise.promisify(groups.isMemberOfGroups),
 	isMembersOfGroup = Promise.promisify(groups.isMembers),
 	getObject = Promise.promisify(db.getObject),
 	setObject = Promise.promisify(db.setObject),
@@ -53,6 +54,12 @@ module.exports = class Application {
 
 	getStatus() {
 		return getObject(rKey + this.tid + ':status');
+	}
+
+	getControls(tid, uid) {
+		let
+			groupNames = config.groupNames;
+		return isMemberOfGroups(uid, groupNames)
 	}
 
 	getSummary() {
@@ -262,5 +269,3 @@ module.exports = class Application {
 		);
 	}
 }
-
-function getVoteMultiplier() {}

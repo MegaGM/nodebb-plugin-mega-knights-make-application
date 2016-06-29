@@ -72,6 +72,27 @@ socketListeners.vote = (socket, data, callback) => {
 		});
 };
 
+socketListeners.getControls = (socket, data, callback) => {
+	// TODO: debug
+	log.debug('getControls\n', data);
+	// check data integrity
+	if (!data || !data.tid)
+		return callback(true, 'invalid data');
+
+	// if anon
+	let
+		uid = parseInt(socket.uid),
+		tid = parseInt(data.tid);
+	if (!uid || !tid)
+		return callback(true, 'invalid tid');
+
+	let a = new Application(data.tid);
+
+	callback(null, {
+		answer: 'meow!'
+	});
+};
+
 socketListeners.getSummary = (socket, data, callback) => {
 	// TODO: debug
 	log.debug('getSummary\n', data);
@@ -117,14 +138,6 @@ socketListeners.getVotersJellyfish = (socket, data, callback) => {
 	// TODO: debug
 	log.debug('getVotes\n', data);
 	callback(null);
-};
-
-socketListeners.getControls = (socket, data, callback) => {
-	// TODO: debug
-	log.debug('getControls\n', data);
-	callback(null, {
-		answer: 'meow!'
-	});
 };
 
 /* ================================================

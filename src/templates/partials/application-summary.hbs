@@ -1,16 +1,19 @@
 <div class="application-summary">
+	<div class="application-controls">
+		{{> application-controls }}
+	</div>
 	<div class="application-status">
 		{{> application-status }}
 	</div>
 	<div class="application-votes">
 		<div class="progress">
-			<div class="progress-bar progress-bar-success" style="width: 45%" data-toggle="tooltip" title="проголосовали ЗА">
+			<div class="positive progress-bar progress-bar-success" style="width: 45%" data-toggle="tooltip" title="проголосовали ЗА">
 				<span class="percents no-select"></span>
 			</div>
-			<div class="progress-bar progress-bar-gray" style="width: 10%" data-toggle="tooltip" title="воздержались от голосования">
+			<div class="jellyfish progress-bar progress-bar-gray" style="width: 10%" data-toggle="tooltip" title="воздержались от голосования">
 				<span class="percents no-select"></span>
 			</div>
-			<div class="progress-bar progress-bar-danger" style="width: 45%" data-toggle="tooltip" title="проголосовали ПРОТИВ">
+			<div class="negative progress-bar progress-bar-danger" style="width: 45%" data-toggle="tooltip" title="проголосовали ПРОТИВ">
 				<span class="percents no-select"></span>
 			</div>
 		</div>

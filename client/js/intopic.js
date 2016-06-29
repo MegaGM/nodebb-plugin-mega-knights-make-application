@@ -7,25 +7,74 @@
 		if (!onTopicPage) return;
 		var mainPostVisible = $('[data-index="0"]').length;
 		if (!mainPostVisible) return;
-		getSummary();
-	}
-
-	function getSummary() {
 		var tid = $('[data-tid]').attr('data-tid');
 		if (!tid) return;
+		getSummary(tid);
+		getControls(tid);
+	}
 
+	function getControls(tid) {
+		socket.emit('plugins.makeApplication.getControls', {
+			tid: tid
+		}, function (err, controls) {
+			if ('break' === controls || err) return;
+			processControls(controls);
+		});
+	}
+
+	function getSummary(tid) {
 		socket.emit('plugins.makeApplication.getSummary', {
 			tid: tid
 		}, function (err, summary) {
-			// TODO: debug
-			console.log(err, summary);
 			if ('break' === summary || err) return;
-
+			if (!summary || !summary.votes || !summary.status)
+				return console.log('no summary in make-application');
+			processSummary(summary);
 			setupTooltips();
-			require(['handlebars', 'make-application/templates'], function (Handlebars) {
-				var html = Handlebars.partials['application-status'](summary);
-				$('.application-status').html(html);
-			});
+		});
+	}
+
+	function processSummary(summary) {
+		// compute progress bars' width
+		var minWidth = 5; // percents
+		var
+			pos = {},
+			neg = {},
+			jf = {};
+		pos.abs = parseInt(summary.votes.positive);
+		neg.abs = parseInt(summary.votes.negative);
+		jf.abs = parseInt(summary.votes.jellyfish);
+
+		// get width of one vote in percents
+		var total = pos.abs + neg.abs + jf.abs,
+			pWidth = (100 - (minWidth * 3)) / total;
+
+		// compute relative % of votes to each other
+		pos.p = +((100 / total) * pos.abs).toFixed(2);
+		neg.p = +((100 / total) * neg.abs).toFixed(2);
+		jf.p = +((100 / total) * jf.abs).toFixed(2);
+
+		// compute final width of votes progress bars
+		pos.w = (pos.abs * pWidth) + minWidth;
+		neg.w = (neg.abs * pWidth) + minWidth;
+		jf.w = (jf.abs * pWidth) + minWidth;
+
+		// re-render progress bars
+		var container = $('.application-votes');
+		container
+			.find('.positive').css('width', pos.w + '%')
+			.find('.percents').text(pos.p);
+		container
+			.find('.negative').css('width', neg.w + '%')
+			.find('.percents').text(neg.p);
+		container
+			.find('.jellyfish').css('width', jf.w + '%')
+			.find('.percents').text(jf.p);
+
+		// re-render status
+		require(['handlebars', 'make-application/templates'], function (Handlebars) {
+			var html = Handlebars.partials['application-status'](summary);
+			$('.application-status').html(html);
 		});
 	}
 
