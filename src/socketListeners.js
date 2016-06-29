@@ -67,8 +67,8 @@ socketListeners.vote = (socket, data, callback) => {
 	uid = data.uid;
 
 	a['vote' + type](now, uid)
-		.then(votesSummary => {
-			callback(null, votesSummary);
+		.then(() => {
+			callback(null);
 		});
 };
 
@@ -87,10 +87,13 @@ socketListeners.getControls = (socket, data, callback) => {
 		return callback(true, 'invalid tid');
 
 	let a = new Application(data.tid);
-
-	callback(null, {
-		answer: 'meow!'
-	});
+	a.getControls(uid)
+		.then(controls => {
+			if ('break' === controls)
+				return callback(true, 'break');
+			else
+				return callback(null, controls);
+		});
 };
 
 socketListeners.getSummary = (socket, data, callback) => {
@@ -102,20 +105,9 @@ socketListeners.getSummary = (socket, data, callback) => {
 	checkCid(data.tid)
 		.then(() => {
 			a = new Application(data.tid);
-			return Promise.join(
-				a.getStatus(),
-				a.getSummary(),
-				(status, votes) => {
-					log.debug('status\n', status);
-					log.debug('votes: \n', votes);
-					return {
-						status,
-						votes
-					};
-				}
-			);
+			return a.getSummary();
 		})
-		.catch(catchBreak)
+		.catch(catchBreak) // catch bad data.tid
 		.then(summary => {
 			if (!summary) return callback(true, 'break');
 			callback(null, summary);

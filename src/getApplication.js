@@ -49,17 +49,6 @@ function getApplicationPage(req, res, next) {
 					gtaRelated: gta
 				});
 			})
-		// .then(results => {
-		// 	res.render('make-application', {
-		// 		title: config.title,
-		// 		breadcrumbs: config.breadcrumbs,
-		// 		statute: results[0],
-		// 		personalRelated: results[1],
-		// 		apbRelated: results[2],
-		// 		bnsRelated: results[3],
-		// 		gtaRelated: results[4]
-		// 	});
-		// })
 		.catch(err => next(err));
 
 }

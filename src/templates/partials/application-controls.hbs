@@ -1,10 +1,13 @@
 {{#if controls}}
+	<a data-vote="positive" class="btn btn-xs btn-success btn-default" href="#" role="button">За</a>
+	<a data-vote="jellyfish" class="btn btn-xs btn-gray" href="#" role="button">Медуза</a>
+	<a data-vote="negative" class="btn btn-xs btn-danger" href="#" role="button">Против</a>
+	<br>
+	<br>
 	{{#if controls.mod}}
-		<a class="btn btn-default" href="#" role="button">Одобрить</a>
-		<a class="btn btn-default" href="#" role="button">Закрыть</a>
-		<a class="btn btn-default" href="#" role="button">Отказать</a>
+		<a class="btn btn-sm btn-success" href="#" role="button">Одобрить</a>
+		<a class="btn btn-sm btn-gray" href="#" role="button">Закрыть</a>
+		<a class="btn btn-sm btn-danger" href="#" role="button">Отказать</a>
+		<br>
 	{{/if}}
-	<a class="btn btn-default" href="#" role="button">За</a>
-	<a class="btn btn-default" href="#" role="button">Медуза</a>
-	<a class="btn btn-default" href="#" role="button">Против</a>
 {{/if}}

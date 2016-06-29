@@ -2,6 +2,24 @@
 	// $(document).on('ready', initiateApplicationInTopic);
 	$(window).on('action:ajaxify.end', initiateApplicationInTopic);
 
+	$(document).on('click', '.application-controls [data-vote]', function (e) {
+		var el = $(e.target),
+			type = el.attr('data-vote'),
+			tid = $('[data-tid]').attr('data-tid');
+		if (!tid) return;
+		vote(tid, type);
+	});
+
+	function vote(tid, type) {
+		socket.emit('plugins.makeApplication.vote', {
+			tid: tid,
+			type: type
+		}, function (err, summary) {
+			if ('break' === summary || err) return;
+			getSummary(tid);
+		});
+	}
+
 	function initiateApplicationInTopic() {
 		var onTopicPage = 0 === window.location.pathname.indexOf('/topic');
 		if (!onTopicPage) return;
@@ -22,13 +40,23 @@
 		});
 	}
 
+	function processControls(controls) {
+		// re-render controls
+		require(['handlebars', 'make-application/templates'], function (Handlebars) {
+			var html = Handlebars.partials['application-controls']({
+				controls: controls
+			});
+			$('.application-controls').html(html);
+		});
+	}
+
 	function getSummary(tid) {
 		socket.emit('plugins.makeApplication.getSummary', {
 			tid: tid
 		}, function (err, summary) {
 			if ('break' === summary || err) return;
 			if (!summary || !summary.votes || !summary.status)
-				return console.log('no summary in make-application');
+				return console.log('no summary');
 			processSummary(summary);
 			setupTooltips();
 		});
@@ -63,13 +91,13 @@
 		var container = $('.application-votes');
 		container
 			.find('.positive').css('width', pos.w + '%')
-			.find('.percents').text(pos.p);
+			.find('.percents').text(pos.p + '%');
 		container
 			.find('.negative').css('width', neg.w + '%')
-			.find('.percents').text(neg.p);
+			.find('.percents').text(neg.p + '%');
 		container
 			.find('.jellyfish').css('width', jf.w + '%')
-			.find('.percents').text(jf.p);
+			.find('.percents').text(jf.p + '%');
 
 		// re-render status
 		require(['handlebars', 'make-application/templates'], function (Handlebars) {

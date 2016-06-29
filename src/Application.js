@@ -52,21 +52,50 @@ module.exports = class Application {
 		return setObject(rKey + this.tid + ':application', areas);
 	}
 
-	getStatus() {
-		return getObject(rKey + this.tid + ':status');
-	}
-
-	getControls(tid, uid) {
+	getControls(uid) {
 		let
-			groupNames = config.groupNames;
+			groupNames = config.groupNames,
+			memberOf = {};
 		return isMemberOfGroups(uid, groupNames)
+			.then(membershipList => {
+				// find out users' groups
+				return _.each(membershipList, (isMember, groupI) => {
+					memberOf[groupNames[groupI]] = isMember;
+				});
+			})
+			.then(() => {
+				// decide if the user has permissions to get controls
+				if (memberOf['Лидеры'] || memberOf['Генералы'] || memberOf['Офицеры'])
+					return 'mod';
+				else if (memberOf['Рекрутеры'] || memberOf['Рыцари'])
+					return 'regular';
+				else
+					return false;
+			})
+			.then(perm => {
+				if (!perm) return 'break';
+				return {
+					mod: perm === 'mod' ? true : false
+				};
+			});
 	}
 
 	getSummary() {
-		return getObject(rKey + this.tid + ':summary')
-			.then(summary => {
-				if (!summary)
-					return this.calculateVotesSummary();
+		let summary = {};
+		return Promise.join(
+			getObject(rKey + this.tid + ':status'),
+			getObject(rKey + this.tid + ':summary'),
+			(status, votesSummary) => {
+				summary.status = status;
+				summary.votes = votesSummary;
+
+				if (!votesSummary)
+					return this.calculateVotesSummary()
+						.then(votesSummary => {
+							summary.votes = votesSummary;
+							return summary;
+						});
+
 				return summary;
 			})
 	}
