@@ -7,6 +7,7 @@ var config = require('./config'),
 	posts = require.main.require('./src/posts'),
 	topics = require.main.require('./src/topics'),
 	user = require.main.require('./src/user'),
+	Application = require('./Application'),
 	temp = {
 		choosenGames: [],
 		newTopics: {},
@@ -83,11 +84,11 @@ var saveApplications = function (req, callback) {
 			callback(null);
 		}, function (err, results) {
 			let now = Date.now(),
-				application = new(require('./Application'))(topicData.tid);
+				a = new Application(topicData.tid);
 
-			application.setCreationTime(now);
-			application.pend(now);
-			application.setAreas(gameAreas, callback);
+			a.setCreationTime(now);
+			a.pend(now);
+			a.setAreas(gameAreas, callback);
 		});
 
 	}, callback);

@@ -1,13 +1,28 @@
-{{#if controls}}
-	<a data-vote="positive" class="btn btn-xs btn-success btn-default" href="#" role="button">За</a>
-	<a data-vote="jellyfish" class="btn btn-xs btn-gray" href="#" role="button">Медуза</a>
-	<a data-vote="negative" class="btn btn-xs btn-danger" href="#" role="button">Против</a>
-	<br>
-	<br>
-	{{#if controls.mod}}
-		<a class="btn btn-sm btn-success" href="#" role="button">Одобрить</a>
-		<a class="btn btn-sm btn-gray" href="#" role="button">Закрыть</a>
-		<a class="btn btn-sm btn-danger" href="#" role="button">Отказать</a>
+{{#if controls.regular}}
+	{{#unless status.resolved}}
+		<a data-vote="positive" class="btn btn-xs btn-success btn-default" href="#" role="button">За</a>
+		<a data-vote="jellyfish" class="btn btn-xs btn-gray" href="#" role="button">Медуза</a>
+		<a data-vote="negative" class="btn btn-xs btn-danger" href="#" role="button">Против</a>
 		<br>
-	{{/if}}
+		<br>
+	{{/unless}}
+{{/if}}
+{{#if controls.mod}}
+	{{#unless status.approved}}
+		{{#unless status.resolved}}
+			<a data-resolve="approve" class="btn btn-sm btn-success" href="#" role="button">Одобрить</a>
+		{{/unless}}
+	{{/unless}}
+	{{#unless status.resolved}}
+		<a data-resolve="resolve" class="btn btn-sm btn-default" href="#" role="button">Закрыть</a>
+	{{/unless}}
+	{{#unless status.pending}}
+		<a data-resolve="pend" class="btn btn-sm btn-default" href="#" role="button">Открыть</a>
+	{{/unless}}
+	{{#unless status.rejected}}
+		{{#unless status.resolved}}
+			<a data-resolve="reject" class="btn btn-sm btn-danger" href="#" role="button">Отказать</a>
+		{{/unless}}
+	{{/unless}}
+	<br>
 {{/if}}

@@ -30,6 +30,7 @@ require('../client/templates');
  * Promisify
  * ===============================================*/
 let dbGetObject = Promise.promisify(db.getObject),
+	isMemberOfGroups = Promise.promisify(groups.isMemberOfGroups),
 	getTopicField = Promise.promisify(topics.getTopicField);
 
 /* ================================================
@@ -39,6 +40,89 @@ socketListeners.test = (socket, data, callback) => {
 	let a = new Application(data.tid);
 	a.calculateVotesSummary();
 	callback(null, 'meow');
+};
+
+socketListeners.resolve = (socket, data, callback) => {
+	// check data integrity
+	if (!data || !data.type || !data.tid)
+		return callback(true, 'invalid data');
+	// if anon
+	let
+		type = data.type,
+		uid = parseInt(socket.uid),
+		tid = parseInt(data.tid);
+	if (!uid || !tid)
+		return callback(true, 'invalid tid');
+
+	let whitelist = ['pend', 'resolve', 'approve', 'reject'];
+	type = ('string' === typeof data.type) ? type : false;
+	if (-1 === whitelist.indexOf(type))
+		return callback(true, 'invalid type');
+
+	let
+		a = null,
+		now = Date.now(),
+		groupNames = config.groupNames,
+		memberOf = {};
+
+	return checkCid(tid)
+		.then(() => {
+			return isMemberOfGroups(uid, groupNames);
+		})
+		.then(membershipList => {
+			// find out users' groups
+			return _.each(membershipList, (isMember, groupI) => {
+				memberOf[groupNames[groupI]] = isMember;
+			});
+		})
+		.then(() => {
+			// decide if the user has permissions to get controls
+			if (memberOf['Лидеры'] || memberOf['Генералы'] || memberOf['Офицеры'])
+				return 'mod';
+			else
+				return false;
+		})
+		.then(perm => {
+			if (!perm) {
+				let error = new Error();
+				error.code = 'break';
+				throw error;
+			}
+		})
+		.then(() => {
+			a = new Application(tid);
+			return a[type](now, uid);
+		})
+		.then(() => {
+			// whether or not topic was locked
+			let topicIsLocked = !('pend' === type);
+			return {
+				topicIsLocked
+			};
+		})
+		.catch(catchBreak) // catch bad data.tid
+		.then(result => {
+			if (!result)
+				return callback(true, 'break');
+			else
+				callback(null);
+
+			SocketIndex.server.sockets.emit('plugins.makeApplication.event.resolve', {
+				tid
+			});
+
+			if (result.topicIsLocked) {
+				SocketIndex.server.sockets.emit('event:topic_locked', {
+					tid,
+					isLocked: result.topicIsLocked
+				});
+			} else {
+				SocketIndex.server.sockets.emit('event:topic_unlocked', {
+					tid,
+					isLocked: result.topicIsLocked
+				});
+			}
+		});
 };
 
 socketListeners.vote = (socket, data, callback) => {
@@ -61,13 +145,20 @@ socketListeners.vote = (socket, data, callback) => {
 	if (-1 === whitelist.indexOf(type))
 		return callback(true, 'invalid type');
 
-	let a = new Application(tid),
+	let a = null,
 		now = Date.now();
-
-	a['vote' + type](now, uid)
+	checkCid(tid)
 		.then(() => {
-			callback(null);
-			SocketIndex.server.sockets.emit('plugins.makeApplication.event.getSummary', {
+			a = new Application(tid);
+			return a['vote' + type](now, uid);
+		})
+		.catch(catchBreak) // catch bad data.tid
+		.then(result => {
+			if (!result)
+				return callback(true, 'break');
+			else
+				callback(null);
+			SocketIndex.server.sockets.emit('plugins.makeApplication.event.vote', {
 				tid
 			});
 		});
@@ -87,14 +178,19 @@ socketListeners.getControls = (socket, data, callback) => {
 	if (!uid || !tid)
 		return callback(true, 'invalid tid');
 
-	let a = new Application(data.tid);
-	a.getControls(uid)
+	let a = null;
+	checkCid(data.tid)
+		.then(() => {
+			a = new Application(data.tid);
+			return a.getControls(uid)
+		})
+		.catch(catchBreak) // catch bad data.tid
 		.then(controls => {
-			if ('break' === controls)
+			if (!controls)
 				return callback(true, 'break');
 			else
 				return callback(null, controls);
-		});
+		})
 };
 
 socketListeners.getSummary = (socket, data, callback) => {
@@ -152,5 +248,6 @@ function checkCid(tid) {
 
 function catchBreak(err) {
 	if ('break' !== err.code) throw err;
+	return false;
 }
 module.exports = socketListeners;

@@ -15,28 +15,46 @@
 			border-color    : #ccc;
 		}
 
-		.progress-bar {
-			cursor: pointer;
+		.application-votes {
+			.progress-bar {
+				cursor: pointer;
 
-			&.progress-bar-gray {
-				background-color: #bfb9b9;
+				&.progress-bar-gray {
+					background-color: #bfb9b9;
+				}
 			}
 		}
 
-		.pending {
-			color: #cf6800;
-		}
+		.application-status {
+			.resolver {
+				.leader {
+					color: #cf0000;
+				}
 
-		.approved {
-			color: #008000;
-		}
+				.general {
+					color: #cf6800;
+				}
 
-		.rejected {
-			color: #cf0000;
-		}
+				.officer {
+					color: #cf6800;
+				}
+			}
 
-		.resolved {
-			color: #535050;
+			.pending {
+				color: #cf6800;
+			}
+
+			.approved {
+				color: #008000;
+			}
+
+			.rejected {
+				color: #cf0000;
+			}
+
+			.resolved {
+				color: #535050;
+			}
 		}
 	}
 

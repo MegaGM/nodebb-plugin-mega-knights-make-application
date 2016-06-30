@@ -11,7 +11,9 @@ let // npm
 	Promise = require('bluebird');
 let // NodeBB
 	db = require.main.require('./src/database'),
-	groups = require.main.require('./src/groups');
+	groups = require.main.require('./src/groups'),
+	topics = require.main.require('./src/topics'),
+	user = require.main.require('./src/user');
 let // logger
 	log4js = require('log4js'),
 	log = log4js.getLogger('Application');
@@ -20,6 +22,9 @@ let // logger
  * Promisify
  * ===============================================*/
 let
+	lockTopic = Promise.promisify(topics.tools.lock),
+	unlockTopic = Promise.promisify(topics.tools.unlock),
+	getUserFields = Promise.promisify(user.getUserFields),
 	isMemberOfGroups = Promise.promisify(groups.isMemberOfGroups),
 	isMembersOfGroup = Promise.promisify(groups.isMembers),
 	getObject = Promise.promisify(db.getObject),
@@ -32,6 +37,7 @@ module.exports = class Application {
 	constructor(tid) {
 		this.tid = tid;
 		this.status = {
+			resolver: 0,
 			pending: 0,
 			resolved: 0,
 			approved: 0,
@@ -74,22 +80,31 @@ module.exports = class Application {
 			})
 			.then(perm => {
 				if (!perm) return 'break';
-				return {
-					mod: perm === 'mod' ? true : false
-				};
+				return getObject(rKey + this.tid + ':status')
+					.then(status => {
+						status = typecastStatus(status);
+						return {
+							status,
+							controls: {
+								regular: !!perm && !status.resolved,
+								mod: perm === 'mod' ? true : false
+							}
+						};
+					})
 			});
 	}
 
 	getSummary() {
 		let summary = {};
+
 		return Promise.join(
 			getObject(rKey + this.tid + ':status'),
 			getObject(rKey + this.tid + ':summary'),
 			(status, votesSummary) => {
-				summary.status = status;
+				summary.status = typecastStatus(status);
 				summary.votes = votesSummary;
-
-				if (!votesSummary)
+				if (!summary.votes ||
+					!summary.votes.positive || !summary.votes.negative || !summary.votes.jellyfish)
 					return this.calculateVotesSummary()
 						.then(votesSummary => {
 							summary.votes = votesSummary;
@@ -238,36 +253,6 @@ module.exports = class Application {
 		);
 	}
 
-	approve(time) {
-		this.status.pending = 0;
-		this.status.resolved = time;
-		this.status.approved = time;
-		this.status.rejected = 0;
-
-		return Promise.join(
-			sortedSetRemove(rKey + 'pending', this.tid),
-			sortedSetAdd(rKey + 'resolved', time, this.tid),
-			sortedSetAdd(rKey + 'approved', time, this.tid),
-			sortedSetRemove(rKey + 'rejected', this.tid),
-			setObject(rKey + this.tid + ':status', this.status)
-		);
-	}
-
-	reject(time) {
-		this.status.pending = 0;
-		this.status.resolved = time;
-		this.status.approved = 0;
-		this.status.rejected = time;
-
-		return Promise.join(
-			sortedSetRemove(rKey + 'pending', this.tid),
-			sortedSetAdd(rKey + 'resolved', time, this.tid),
-			sortedSetRemove(rKey + 'approved', this.tid),
-			sortedSetAdd(rKey + 'rejected', time, this.tid),
-			setObject(rKey + this.tid + ':status', this.status)
-		);
-	}
-
 	pend(time) {
 		this.status.pending = time;
 		this.status.resolved = 0;
@@ -279,11 +264,13 @@ module.exports = class Application {
 			sortedSetRemove(rKey + 'resolved', this.tid),
 			sortedSetRemove(rKey + 'approved', this.tid),
 			sortedSetRemove(rKey + 'rejected', this.tid),
-			setObject(rKey + this.tid + ':status', this.status)
+			setObject(rKey + this.tid + ':status', this.status),
+			unlockTopic(this.tid, 1),
+			this.setResolver(0)
 		);
 	}
 
-	resolve(time) {
+	resolve(time, uid) {
 		this.status.pending = 0;
 		this.status.resolved = time;
 		this.status.approved = 0;
@@ -294,7 +281,97 @@ module.exports = class Application {
 			sortedSetAdd(rKey + 'resolved', time, this.tid),
 			sortedSetRemove(rKey + 'approved', this.tid),
 			sortedSetRemove(rKey + 'rejected', this.tid),
-			setObject(rKey + this.tid + ':status', this.status)
+			setObject(rKey + this.tid + ':status', this.status),
+			lockTopic(this.tid, uid),
+			this.setResolver(uid)
 		);
 	}
+
+	approve(time, uid) {
+		this.status.pending = 0;
+		this.status.resolved = time;
+		this.status.approved = time;
+		this.status.rejected = 0;
+
+		return Promise.join(
+			sortedSetRemove(rKey + 'pending', this.tid),
+			sortedSetAdd(rKey + 'resolved', time, this.tid),
+			sortedSetAdd(rKey + 'approved', time, this.tid),
+			sortedSetRemove(rKey + 'rejected', this.tid),
+			setObject(rKey + this.tid + ':status', this.status),
+			lockTopic(this.tid, uid),
+			this.setResolver(uid)
+		);
+	}
+
+	reject(time, uid) {
+		this.status.pending = 0;
+		this.status.resolved = time;
+		this.status.approved = 0;
+		this.status.rejected = time;
+
+		return Promise.join(
+			sortedSetRemove(rKey + 'pending', this.tid),
+			sortedSetAdd(rKey + 'resolved', time, this.tid),
+			sortedSetRemove(rKey + 'approved', this.tid),
+			sortedSetAdd(rKey + 'rejected', time, this.tid),
+			setObject(rKey + this.tid + ':status', this.status),
+			lockTopic(this.tid, uid),
+			this.setResolver(uid)
+		);
+	}
+
+	setResolver(uid) {
+		if (!(uid = parseInt(uid))) return;
+
+		let
+			groupNames = config.groupNames,
+			memberOf = {},
+			resolver = {};
+
+		return isMemberOfGroups(uid, groupNames)
+			.then(membershipList => {
+				// find out users' groups
+				return _.each(membershipList, (isMember, groupI) => {
+					memberOf[groupNames[groupI]] = isMember;
+				});
+			})
+			.then(() => {
+				// TODO: debug
+				console.debug('getUserFields');
+				return getUserFields(uid, ['username', 'userslug'])
+					.then(userFields => {
+						// TODO: debug
+						resolver.username = userFields.username;
+						resolver.userslug = userFields.userslug;
+						console.debug('userFields\n', userFields);
+					});
+			})
+			.then(() => {
+				resolver.uid = uid;
+				if (memberOf['Офицеры'])
+					resolver.role = 'officer';
+				if (memberOf['Генералы'])
+					resolver.role = 'general';
+				if (memberOf['Лидер'])
+					resolver.role = 'leader';
+			})
+			.then(() => {
+				return setObject(rKey + this.tid + ':status', {
+					resolver: JSON.stringify(resolver)
+				});
+			})
+	}
+
+}
+
+function typecastStatus(status) {
+	// typecast after Redis >.<
+	status.resolver = status.resolver === '0' ?
+		0 : JSON.parse(status.resolver);
+	status.pending = parseInt(status.pending);
+	status.resolved = parseInt(status.resolved);
+	status.approved = parseInt(status.approved);
+	status.rejected = parseInt(status.rejected);
+	return status;
 }

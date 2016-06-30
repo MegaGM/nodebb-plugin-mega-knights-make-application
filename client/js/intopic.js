@@ -2,8 +2,19 @@
 	// $(document).on('ready', initiateApplicationInTopic);
 	$(window).on('action:ajaxify.end', initiateApplicationInTopic);
 
-	socket.on('plugins.makeApplication.event.getSummary', function (data) {
+	socket.on('plugins.makeApplication.event.vote', function (data) {
+		if (!$('[data-tid]').length) return;
+		var tid = $('[data-tid]').attr('data-tid');
+		if (!tid) return;
 		getSummary(data.tid);
+	});
+
+	socket.on('plugins.makeApplication.event.resolve', function (data) {
+		if (!$('[data-tid]').length) return;
+		var tid = $('[data-tid]').attr('data-tid');
+		if (!tid) return;
+		getSummary(data.tid);
+		getControls(data.tid);
 	});
 
 	$(document).on('click', '.application-controls [data-vote]', function (e) {
@@ -14,14 +25,29 @@
 		vote(tid, type);
 	});
 
+	$(document).on('click', '.application-controls [data-resolve]', function (e) {
+		var el = $(e.target),
+			type = el.attr('data-resolve'),
+			tid = $('[data-tid]').attr('data-tid');
+		if (!tid) return;
+		resolve(tid, type);
+	});
+
+	function resolve(tid, type) {
+		socket.emit('plugins.makeApplication.resolve', {
+			tid: tid,
+			type: type
+		}, function (err, result) {
+			if ('break' === result || err) return;
+		});
+	}
+
 	function vote(tid, type) {
 		socket.emit('plugins.makeApplication.vote', {
 			tid: tid,
 			type: type
-		}, function (err, summary) {
-			console.log('vote callback', err, summary);
-			if ('break' === summary || err) return;
-			// getSummary(tid);
+		}, function (err, result) {
+			if ('break' === result || err) return;
 		});
 	}
 
@@ -48,9 +74,7 @@
 	function processControls(controls) {
 		// re-render controls
 		require(['handlebars', 'make-application/templates'], function (Handlebars) {
-			var html = Handlebars.partials['application-controls']({
-				controls: controls
-			});
+			var html = Handlebars.partials['application-controls'](controls);
 			$('.application-controls').html(html);
 		});
 	}
