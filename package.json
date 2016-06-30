@@ -1,6 +1,6 @@
 {
   "name": "nodebb-plugin-mega-knights-make-application",
-  "version": "0.0.39",
+  "version": "0.0.40",
   "description": "Make application page for Knights site",
   "main": "library.js",
   "scripts": {
