@@ -29,7 +29,10 @@ require('../client/templates');
 /* ================================================
  * Promisify
  * ===============================================*/
-let dbGetObject = Promise.promisify(db.getObject),
+let
+	joinGroup = Promise.promisify(groups.join),
+	leaveGroup = Promise.promisify(groups.leave),
+	dbGetObject = Promise.promisify(db.getObject),
 	isMemberOfGroups = Promise.promisify(groups.isMemberOfGroups),
 	getTopicField = Promise.promisify(topics.getTopicField);
 
@@ -43,15 +46,17 @@ socketListeners.test = (socket, data, callback) => {
 };
 
 socketListeners.resolve = (socket, data, callback) => {
+	// TODO: debug
+	log.debug('resolve uid\n', socket.uid);
 	// check data integrity
 	if (!data || !data.type || !data.tid)
 		return callback(true, 'invalid data');
 	// if anon
 	let
 		type = data.type,
-		uid = parseInt(socket.uid),
+		uidResolver = parseInt(socket.uid),
 		tid = parseInt(data.tid);
-	if (!uid || !tid)
+	if (!uidResolver || !tid)
 		return callback(true, 'invalid tid');
 
 	let whitelist = ['pend', 'resolve', 'approve', 'reject'];
@@ -63,11 +68,16 @@ socketListeners.resolve = (socket, data, callback) => {
 		a = null,
 		now = Date.now(),
 		groupNames = config.groupNames,
+		uidApplicant = 0,
 		memberOf = {};
 
 	return checkCid(tid)
 		.then(() => {
-			return isMemberOfGroups(uid, groupNames);
+			return getTopicField(tid, 'uid')
+		})
+		.then(_uidApplicant => {
+			uidApplicant = _uidApplicant;
+			return isMemberOfGroups(uidApplicant, groupNames);
 		})
 		.then(membershipList => {
 			// find out users' groups
@@ -77,7 +87,7 @@ socketListeners.resolve = (socket, data, callback) => {
 		})
 		.then(() => {
 			// decide if the user has permissions to get controls
-			if (memberOf['Лидеры'] || memberOf['Генералы'] || memberOf['Офицеры'])
+			if (memberOf['Лидер'] || memberOf['Генералы'] || memberOf['Офицеры'])
 				return 'mod';
 			else
 				return false;
@@ -91,7 +101,38 @@ socketListeners.resolve = (socket, data, callback) => {
 		})
 		.then(() => {
 			a = new Application(tid);
-			return a[type](now, uid);
+			return a[type](now, uidResolver);
+		})
+		.then(() => {
+			// join or leave group
+			return getTopicField(tid, 'cid')
+				.then(cid => {
+					let groupsToJoinOrLeave = null;
+					_.each(config.groupsByCid, (groups, key) => {
+						if (key !== cid) return;
+						groupsToJoinOrLeave = groups;
+					});
+					return groupsToJoinOrLeave;
+				})
+				.then(groups => {
+					// groups = ['Рыцари','APB'];
+					return isMemberOfGroups(uidApplicant, groups)
+						.then(membership => {
+							// membership = [false,false];
+							let grantToJoin = ('approve' === type); // true
+							let grantToLeave = !('approve' === type); // true
+
+							return Promise.map(groups, (groupName, groupI) => {
+								// TODO: debug
+								log.debug('joinOrLeaveGroup uid\n', uidApplicant);
+								if (grantToJoin && !membership[groupI])
+									return joinGroup(groupName, uidApplicant);
+								if (grantToLeave && membership[groupI])
+									return leaveGroup(groupName, uidApplicant);
+								return 'noop';
+							});
+						});
+				});
 		})
 		.then(() => {
 			// whether or not topic was locked
@@ -107,6 +148,7 @@ socketListeners.resolve = (socket, data, callback) => {
 			else
 				callback(null);
 
+			// update UI
 			SocketIndex.server.sockets.emit('plugins.makeApplication.event.resolve', {
 				tid
 			});

@@ -206,7 +206,7 @@
 			'bns-char-level': {
 				'required': true
 			},
-			'bns-char-screenshot-url-lobby': {
+			'bns-screenshot-url-lobby': {
 				'required': true,
 				'sensitive': true,
 				'url': {
@@ -231,7 +231,7 @@
 					min: 20,
 					max: 100
 				}
-			},
+			}
 		};
 
 		function getRuleName(originalId) {

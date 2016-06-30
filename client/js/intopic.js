@@ -103,18 +103,30 @@
 		jf.abs = parseInt(summary.votes.jellyfish);
 
 		// get width of one vote in percents
-		var total = pos.abs + neg.abs + jf.abs,
-			pWidth = (100 - (minWidth * 3)) / total;
+		var total = pos.abs + neg.abs + jf.abs;
+		if (total) {
+			var pWidth = (100 - (minWidth * 3)) / total;
 
-		// compute relative % of votes to each other
-		pos.p = +((100 / total) * pos.abs).toFixed(2);
-		neg.p = +((100 / total) * neg.abs).toFixed(2);
-		jf.p = +((100 / total) * jf.abs).toFixed(2);
+			// compute relative % of votes to each other
+			pos.p = +((100 / total) * pos.abs).toFixed(2);
+			neg.p = +((100 / total) * neg.abs).toFixed(2);
+			jf.p = +((100 / total) * jf.abs).toFixed(2);
 
-		// compute final width of votes progress bars
-		pos.w = (pos.abs * pWidth) + minWidth;
-		neg.w = (neg.abs * pWidth) + minWidth;
-		jf.w = (jf.abs * pWidth) + minWidth;
+			// compute final width of votes progress bars
+			pos.w = (pos.abs * pWidth) + minWidth;
+			neg.w = (neg.abs * pWidth) + minWidth;
+			jf.w = (jf.abs * pWidth) + minWidth;
+		} else {
+			// fill zero
+			pos.p = 0;
+			neg.p = 0;
+			jf.p = 0;
+
+			// fill standard width
+			pos.w = 40;
+			neg.w = 40;
+			jf.w = 20;
+		}
 
 		// re-render progress bars
 		var container = $('.application-votes');

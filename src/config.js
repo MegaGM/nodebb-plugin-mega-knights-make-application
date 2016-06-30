@@ -16,6 +16,10 @@ let // logger
 	};
 log4js.configure(logOptions);
 
+let
+	apbCid = 14,
+	bnsCid = 22,
+	gtaCid = 9;
 let // actual config
 	config = {
 	logOptions: logOptions,
@@ -25,9 +29,9 @@ let // actual config
 	}]),
 	statutePid: '2',
 	gameCids: {
-		apb: 14,
-		bns: 22,
-		gta: 9
+		apb: apbCid,
+		bns: bnsCid,
+		gta: gtaCid
 	},
 	groupNames: [ // should be in asc
 		'Рыцари',
@@ -36,12 +40,17 @@ let // actual config
 		'Генералы',
 		'Лидер'
 	],
+	groupsByCid: {
+		[apbCid]: ['Рыцари', 'APB'],
+		[bnsCid]: ['Рыцари', 'BNS'],
+		[gtaCid]: ['Рыцари', 'GTA']
+	},
 	voteMultipliers: {
 		'Рыцари': 1,
 		'Рекрутеры': 10,
 		'Офицеры': 30,
 		'Генералы': 75,
-		'Лидер': 1
+		'Лидер': 100
 	},
 	gameCheckboxRegexp: /i-choose-(\w{3})/i,
 	gameCharRegexp: /(\w{3})-char-(\d+)/i,

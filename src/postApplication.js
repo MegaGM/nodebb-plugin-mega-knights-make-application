@@ -86,9 +86,10 @@ var saveApplications = function (req, callback) {
 			let now = Date.now(),
 				a = new Application(topicData.tid);
 
-			a.setCreationTime(now);
-			a.pend(now);
-			a.setAreas(gameAreas, callback);
+			a.setCreationTime(now)
+				.then(() => a.pend(now))
+				.then(() => a.setAreas(gameAreas))
+				.then(() => callback(null));
 		});
 
 	}, callback);

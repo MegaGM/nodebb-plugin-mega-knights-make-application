@@ -111,8 +111,6 @@ $(document).on('ready', function (e) {
 
 		// check if at least one character was created for each choosen game
 		gameCheckboxes.each(function (i, game) {
-			// TODO: stub
-			return;
 			// skip if gta, because it doesn't require any characters
 			if ('gta' === game) return;
 
@@ -149,13 +147,9 @@ $(document).on('ready', function (e) {
 
 					// if it's not game related then it's personal or contact, keep them
 					if (!game) return true;
-					console.log('filter game, id: ', game, el.prop('id'));
-					// console.log('gameCheckboxes', gameCheckboxes);
-
 					// if it's game related, check if gameCheckbox was checked
 					return gameCheckboxes
 						.filter(function (i, item) {
-							console.log('gameCheckboxes map: ', item, 'item === game', item === game);
 							return item === game
 						}).length;
 				})
@@ -175,6 +169,8 @@ $(document).on('ready', function (e) {
 				});
 
 			validation.validateAreas(validator, areas, function (errors) {
+				// TODO: debug
+				console.log('after validation!', errors);
 				if (!errors.noErrors) return showErrors(errors);
 
 				$.ajax({

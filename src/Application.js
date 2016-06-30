@@ -71,7 +71,7 @@ module.exports = class Application {
 			})
 			.then(() => {
 				// decide if the user has permissions to get controls
-				if (memberOf['Лидеры'] || memberOf['Генералы'] || memberOf['Офицеры'])
+				if (memberOf['Лидер'] || memberOf['Генералы'] || memberOf['Офицеры'])
 					return 'mod';
 				else if (memberOf['Рекрутеры'] || memberOf['Рыцари'])
 					return 'regular';
@@ -101,6 +101,8 @@ module.exports = class Application {
 			getObject(rKey + this.tid + ':status'),
 			getObject(rKey + this.tid + ':summary'),
 			(status, votesSummary) => {
+				// TODO: debug
+				console.debug('getSummary\n', status, votesSummary);
 				summary.status = typecastStatus(status);
 				summary.votes = votesSummary;
 				if (!summary.votes ||
@@ -127,6 +129,8 @@ module.exports = class Application {
 
 		return this.getVotes()
 			.then(_votes => {
+				// TODO: debug
+				console.debug('getVotes\n', _votes);
 				votes = _votes;
 				// pick uids
 				return _.each(votes, type => {
