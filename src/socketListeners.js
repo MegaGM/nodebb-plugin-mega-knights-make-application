@@ -46,8 +46,6 @@ socketListeners.test = (socket, data, callback) => {
 };
 
 socketListeners.resolve = (socket, data, callback) => {
-	// TODO: debug
-	log.debug('resolve uid\n', socket.uid);
 	// check data integrity
 	if (!data || !data.type || !data.tid)
 		return callback(true, 'invalid data');
@@ -123,8 +121,6 @@ socketListeners.resolve = (socket, data, callback) => {
 							let grantToLeave = !('approve' === type); // true
 
 							return Promise.map(groups, (groupName, groupI) => {
-								// TODO: debug
-								log.debug('joinOrLeaveGroup uid\n', uidApplicant);
 								if (grantToJoin && !membership[groupI])
 									return joinGroup(groupName, uidApplicant);
 								if (grantToLeave && membership[groupI])
@@ -207,8 +203,6 @@ socketListeners.vote = (socket, data, callback) => {
 };
 
 socketListeners.getControls = (socket, data, callback) => {
-	// TODO: debug
-	log.debug('getControls\n', data);
 	// check data integrity
 	if (!data || !data.tid)
 		return callback(true, 'invalid data');
@@ -236,8 +230,6 @@ socketListeners.getControls = (socket, data, callback) => {
 };
 
 socketListeners.getSummary = (socket, data, callback) => {
-	// TODO: debug
-	log.debug('getSummary\n', data);
 	if (!data || !data.tid) return callback(true, 'invalid data');
 
 	let a = null;
@@ -254,20 +246,17 @@ socketListeners.getSummary = (socket, data, callback) => {
 };
 
 socketListeners.getVotersPositive = (socket, data, callback) => {
-	// TODO: debug
-	log.debug('getVotes\n', data);
+	// TODO: implement
 	callback(null);
 };
 
 socketListeners.getVotersNegative = (socket, data, callback) => {
-	// TODO: debug
-	log.debug('getVotes\n', data);
+	// TODO: implement
 	callback(null);
 };
 
 socketListeners.getVotersJellyfish = (socket, data, callback) => {
-	// TODO: debug
-	log.debug('getVotes\n', data);
+	// TODO: implement
 	callback(null);
 };
 

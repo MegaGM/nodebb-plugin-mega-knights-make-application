@@ -73,7 +73,7 @@
 
 	function processControls(controls) {
 		// re-render controls
-		require(['handlebars', 'make-application/templates'], function (Handlebars) {
+		require(['handlebars', 'knights-make-application/templates'], function (Handlebars) {
 			var html = Handlebars.partials['application-controls'](controls);
 			$('.application-controls').html(html);
 		});
@@ -141,7 +141,7 @@
 			.find('.percents').text(jf.p + '%');
 
 		// re-render status
-		require(['handlebars', 'make-application/templates'], function (Handlebars) {
+		require(['handlebars', 'knights-make-application/templates'], function (Handlebars) {
 			var html = Handlebars.partials['application-status'](summary);
 			$('.application-status').html(html);
 		});

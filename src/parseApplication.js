@@ -1,5 +1,6 @@
 'use strict';
-let config = require('./config'),
+let
+	config = require('./config'),
 	_ = require('lodash'),
 	jwt = require('jsonwebtoken'),
 	Promise = require('bluebird'),
@@ -8,8 +9,12 @@ let config = require('./config'),
 	groups = require.main.require('./src/groups'),
 	Application = require('./Application'),
 	validation = require('../client/js/validation');
+let // logger
+	log4js = require('log4js'),
+	log = log4js.getLogger('parseApplication');
 
-let Handlebars = require('handlebars');
+let // templates
+	Handlebars = require('handlebars');
 require('../client/templates');
 
 /* ================================================

@@ -1,5 +1,6 @@
 'use strict';
-var config = require('./config'),
+let
+	config = require('./config'),
 	jwt = require('jsonwebtoken'),
 	async = require.main.require('async'),
 	db = require.main.require('./src/database/redis'),
@@ -15,6 +16,9 @@ var config = require('./config'),
 	},
 	validator = require('validator'),
 	validation = require('../client/js/validation.js');
+let // logger
+	log4js = require('log4js'),
+	log = log4js.getLogger('postApplication');
 
 /* ================================================
  * POST
@@ -130,23 +134,12 @@ function postApplicationPage(req, res, next) {
 			saveApplications: async.apply(saveApplications, req),
 			editPosts: async.apply(editPosts, req)
 		}, function (err, results) {
-			if (err) {
-				if ('validation' === err)
-					return res.status(400).json('400 Data Process Error: not valid data has been recieved from client');
-				else
-					return next(err);
-			}
+			if ('validation' === err)
+				return res.status(400).json('400 Data Process Error: not valid data has been recieved from client');
+			if (err) return next(err);
 
-			// send info for redirecting
-			var tidUrls = [];
-
-			Object.keys(temp.newTopics)
-				.forEach(function (key) {
-					var newTopic = temp.newTopics[key];
-					tidUrls.push('/topic/' + newTopic.tid);
-				});
-			res.status(200).json({
-				tidUrls: tidUrls
+			return res.status(200).json({
+				all: 'green'
 			});
 		});
 

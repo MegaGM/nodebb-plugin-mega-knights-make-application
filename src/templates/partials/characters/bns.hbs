@@ -103,21 +103,26 @@
 		</div>
 
 		{{! screenshot column }}
-		{{! TODO: make hbs ifelse }}
 		<div class="col-xs-12 col-md-4">
 			<div class="form-group inline-block">
 				<label for="bns-char-{{charI}}-screenshot-url-charstats">Скриншот статистики персонажа</label>
 				<br>
-				<div class="screenshot-placeholder">
-					<i class="icon fa fa-cloud-upload fa-3x"></i>
-					<input id="bns-char-{{charI}}-screenshot-url-charstats" class="screenshot-url" type="text">
+				{{#if char}}
+					<a href="{{char.bns-char-screenshot-url-charstats}}" target="_blank">
+						<div class="screenshot-placeholder no-border" style="background-image: url('{{char.bns-char-screenshot-url-charstats}}')"></div>
+					</a>
+				{{else}}
+					<div class="screenshot-placeholder">
+						<i class="icon fa fa-cloud-upload fa-3x"></i>
+						<input id="bns-char-{{charI}}-screenshot-url-charstats" class="screenshot-url" type="text">
 
-					<form class="screenshot-form" action="/api/post/upload" method="post" enctype="multipart/form-data">
-						<input class="screenshot-fileinput" type="file" name="files[]">
-					</form>
-				</div>
+						<form class="screenshot-form" action="/api/post/upload" method="post" enctype="multipart/form-data">
+							<input class="screenshot-fileinput" type="file" name="files[]">
+						</form>
+					</div>
+				{{/if}}
 			</div>
-
 		</div>
+
 	</div>
 </div>

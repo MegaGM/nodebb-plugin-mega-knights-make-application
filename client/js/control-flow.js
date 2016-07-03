@@ -125,7 +125,7 @@ $(document).on('ready', function (e) {
 
 		if (!errors.noErrors) return showErrors(errors);
 
-		require(['make-application/validator', 'make-application/validation', 'csrf'], function (validator, validation, csrf) {
+		require(['knights-make-application/validator', 'knights-make-application/validation', 'csrf'], function (validator, validation, csrf) {
 			var rules = validation.rules,
 				getRuleName = validation.getRuleName;
 
@@ -169,8 +169,6 @@ $(document).on('ready', function (e) {
 				});
 
 			validation.validateAreas(validator, areas, function (errors) {
-				// TODO: debug
-				console.log('after validation!', errors);
 				if (!errors.noErrors) return showErrors(errors);
 
 				$.ajax({
@@ -185,28 +183,29 @@ $(document).on('ready', function (e) {
 						areas: areas
 					}),
 					statusCode: {
+						200: onComplete,
 						400: showNodeBBError,
 						403: showNodeBBError,
 						500: showNodeBBError
-					},
-					complete: function (data) {
-						var data = data.responseJSON;
-						app.alert({
-							type: 'success',
-							title: 'Заявка успешно создана!',
-							message: 'Вы будете перенаправлены через 5 секунд',
-							timeout: 5000,
-							clickfn: function () {
-								window.location.href = data.tidUrls[0];
-							}
-						});
-
-						setTimeout(function () {
-							if (!data || !data.tidUrls) return;
-							window.location.href = data.tidUrls[0];
-						}, 5000);
 					}
 				});
+
+				function onComplete(data) {
+					var redirectURL = '/category/5';
+					app.alert({
+						type: 'success',
+						title: 'Заявка успешно создана!',
+						message: 'Вы будете перенаправлены через секунду',
+						timeout: 3000,
+						clickfn: function () {
+							window.location.href = redirectURL;
+						}
+					});
+
+					setTimeout(function () {
+						window.location.href = redirectURL;
+					}, 1000);
+				}
 
 				function showNodeBBError(data) {
 					data.responseJSON = data.responseJSON ? data.responseJSON : 'Error';

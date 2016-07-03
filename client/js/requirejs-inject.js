@@ -4,10 +4,10 @@
 
 	// to prevent changing of NodeBB templates
 	// inject modules directly to RequireJS config file
-	var moduleName = 'make-application/',
-		modulePath = '../../plugins/nodebb-plugin-mega-knights-make-application/';
+	var pluginPrefix = 'knights-make-application/',
+		pluginPath = '../../plugins/nodebb-plugin-mega-knights-make-application/';
 	var registerAMD = function (name, path) {
-		rjsConfig.paths[moduleName + name] = modulePath + path;
+		rjsConfig.paths[pluginPrefix + name] = pluginPath + path;
 	};
 
 	registerAMD('localStorage', 'js/lib/store.min');
@@ -17,5 +17,5 @@
 
 	// Handlebars is an exception! Let it register without any namespace, if it wasn't already registered
 	if (!rjsConfig.paths['handlebars'])
-		rjsConfig.paths['handlebars'] = modulePath + 'js/lib/handlebars.runtime-v4.0.5';
+		rjsConfig.paths['handlebars'] = pluginPath + 'js/lib/handlebars.runtime-v4.0.5';
 })();

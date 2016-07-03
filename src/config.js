@@ -10,7 +10,7 @@ let // logger
 			type: 'console',
 			layout: {
 				type: 'pattern',
-				pattern: '%d{ABSOLUTE} %[%c.%p%] - %m'
+				pattern: '%d{ABSOLUTE} %[%c%] - %m'
 			}
 		}]
 	};

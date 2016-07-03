@@ -2,17 +2,26 @@
 	<hr>
 	<h3 class="header">Blade and Soul</h3>
 	Основные крафтовые профессии ? (минимальный 3-й уровень) Какой у вас опыт в данной игре?
+
 	<div class="form-group form-inline">
 		<label>Что предпочитаете?</label>
 		<br>
 		<div class="checkbox">
 			<label for="bns-i-play-pvp">
-				<input type="checkbox" id="bns-i-play-pvp"> PVP
+				{{#if areas}}
+					<input type="checkbox" id="bns-i-play-pvp" disabled="disabled" {{#if areas.bns-i-play-pvp}} checked="checked" {{/if}}> PVP
+				{{else}}
+					<input type="checkbox" id="bns-i-play-pvp"> PVP
+				{{/if}}
 			</label>
 		</div>
 		<div class="checkbox">
 			<label for="bns-i-play-pve">
-				<input type="checkbox" id="bns-i-play-pve"> PVE
+				{{#if areas}}
+					<input type="checkbox" id="bns-i-play-pve" disabled="disabled" {{#if areas.bns-i-play-pve}} checked="checked" {{/if}}> PVE
+				{{else}}
+					<input type="checkbox" id="bns-i-play-pve"> PVE
+				{{/if}}
 			</label>
 		</div>
 	</div>
@@ -22,22 +31,38 @@
 		<br>
 		<div class="checkbox">
 			<label for="bns-i-play-morning">
-				<input type="checkbox" id="bns-i-play-morning"> Утром
+				{{#if areas}}
+					<input type="checkbox" id="bns-i-play-morning" disabled="disabled" {{#if areas.bns-i-play-morning}} checked="checked" {{/if}}> Утром
+				{{else}}
+					<input type="checkbox" id="bns-i-play-morning"> Утром
+				{{/if}}
 			</label>
 		</div>
 		<div class="checkbox">
 			<label for="bns-i-play-day">
-				<input type="checkbox" id="bns-i-play-day"> Днём
+				{{#if areas}}
+					<input type="checkbox" id="bns-i-play-day" disabled="disabled" {{#if areas.bns-i-play-day}} checked="checked" {{/if}}> Днём
+				{{else}}
+					<input type="checkbox" id="bns-i-play-day"> Днём
+				{{/if}}
 			</label>
 		</div>
 		<div class="checkbox">
 			<label for="bns-i-play-evening">
-				<input type="checkbox" id="bns-i-play-evening"> Вечером
+				{{#if areas}}
+					<input type="checkbox" id="bns-i-play-evening" disabled="disabled" {{#if areas.bns-i-play-evening}} checked="checked" {{/if}}> Вечером
+				{{else}}
+					<input type="checkbox" id="bns-i-play-evening"> Вечером
+				{{/if}}
 			</label>
 		</div>
 		<div class="checkbox">
 			<label for="bns-i-play-night">
-				<input type="checkbox" id="bns-i-play-night"> Ночью
+				{{#if areas}}
+					<input type="checkbox" id="bns-i-play-night" disabled="disabled" {{#if areas.bns-i-play-night}} checked="checked" {{/if}}> Ночью
+				{{else}}
+					<input type="checkbox" id="bns-i-play-night"> Ночью
+				{{/if}}
 			</label>
 		</div>
 	</div>
@@ -47,12 +72,25 @@
 		<div class="col-xs-12 col-md-8">
 			<div class="form-group">
 				<label for="bns-previous-clans">Названия всех кланов, в которых состояли все Ваши персонажи</label>
-				<input id="bns-previous-clans" class="form-control" type="text" placeholder="WASP, 8Bit, BitFenix">
+				<br>
+				{{#if areas}}
+					<div id="bns-previous-clans" class="form-control">
+						{{#fill areas.bns-previous-clans}}{{/fill}}
+					</div>
+				{{else}}
+					<input id="bns-previous-clans" class="form-control" type="text" placeholder="WASP, 8Bit, BitFenix">
+				{{/if}}
 			</div>
-
 			<div class="form-group">
 				<label for="bns-leave-reasons">Причины, по которым Вы покинули предыдущие кланы</label>
-				<textarea id="bns-leave-reasons" class="form-control" rows="3" placeholder="WASP: проиграли на конкурсе MissAPB 1999 - я не стерпел. 8Bit: не понимаю английского языка, решил уйти. BitFenix: был конфликт с членами клана, неподелили лут"></textarea>
+				<br>
+				{{#if areas}}
+					<div id="bns-leave-reasons" class="form-control">
+						{{#fill areas.bns-leave-reasons}}{{/fill}}
+					</div>
+				{{else}}
+					<textarea id="bns-leave-reasons" class="form-control" rows="3" placeholder="WASP: проиграли на конкурсе Missbns 1999 - я не стерпел. 8Bit: не понимаю английского языка, решил уйти. BitFenix: был конфликт с членами клана, неподелили грабящую серебряшку с $80k, я просил ребят дать её мне, а они ни в какую"></textarea>
+				{{/if}}
 			</div>
 		</div>
 

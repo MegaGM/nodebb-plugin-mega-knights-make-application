@@ -27,6 +27,8 @@ let
 	getUserFields = Promise.promisify(user.getUserFields),
 	isMemberOfGroups = Promise.promisify(groups.isMemberOfGroups),
 	isMembersOfGroup = Promise.promisify(groups.isMembers),
+	getKey = Promise.promisify(db.get),
+	setKey = Promise.promisify(db.set),
 	getObject = Promise.promisify(db.getObject),
 	setObject = Promise.promisify(db.setObject),
 	sortedSetAdd = Promise.promisify(db.sortedSetAdd),
@@ -49,13 +51,13 @@ module.exports = class Application {
 		return sortedSetAdd(rKey + 'created', time, this.tid);
 	}
 
-	// TODO: test this method
 	getAreas() {
-		return getObject(rKey + this.tid + ':application');
+		return getKey(rKey + this.tid + ':application')
+			.then(JSON.parse);
 	}
 
 	setAreas(areas) {
-		return setObject(rKey + this.tid + ':application', areas);
+		return setKey(rKey + this.tid + ':application', JSON.stringify(areas));
 	}
 
 	getControls(uid) {
@@ -86,8 +88,8 @@ module.exports = class Application {
 						return {
 							status,
 							controls: {
-								regular: !!perm && !status.resolved,
-								mod: perm === 'mod' ? true : false
+								regular: perm && !status.resolved,
+								mod: (perm === 'mod')
 							}
 						};
 					})
@@ -101,8 +103,6 @@ module.exports = class Application {
 			getObject(rKey + this.tid + ':status'),
 			getObject(rKey + this.tid + ':summary'),
 			(status, votesSummary) => {
-				// TODO: debug
-				console.debug('getSummary\n', status, votesSummary);
 				summary.status = typecastStatus(status);
 				summary.votes = votesSummary;
 				if (!summary.votes ||
@@ -118,8 +118,6 @@ module.exports = class Application {
 	}
 
 	calculateVotesSummary() {
-		// TODO: debug
-		let start = Date.now();
 		let
 			votes,
 			uids = [],
@@ -129,8 +127,6 @@ module.exports = class Application {
 
 		return this.getVotes()
 			.then(_votes => {
-				// TODO: debug
-				console.debug('getVotes\n', _votes);
 				votes = _votes;
 				// pick uids
 				return _.each(votes, type => {
@@ -141,8 +137,6 @@ module.exports = class Application {
 				});
 			})
 			.then(() => {
-				// TODO: debug
-				log.debug('uids: \n', uids);
 				return Promise
 					.map(groupNames, groupName => {
 						// get an array of membership lists
@@ -152,8 +146,6 @@ module.exports = class Application {
 			.then(membershipLists => {
 				// compute memberOf hash
 				return _.each(membershipLists, (membershipList, groupI) => {
-					// TODO: debug
-					log.debug('membershipList: \n', membershipList);
 					return _.each(membershipList, (isMember, uidI) => {
 						if (!memberOf[groupNames[groupI]])
 							memberOf[groupNames[groupI]] = {};
@@ -162,8 +154,6 @@ module.exports = class Application {
 				});
 			})
 			.then(() => {
-				// TODO: debug
-				log.debug('memberOf: \n', memberOf);
 				// compute vote multiplier
 				return _.each(uids, uid => {
 					let multiplier = 0;
@@ -175,8 +165,6 @@ module.exports = class Application {
 				});
 			})
 			.then(() => {
-				// TODO: debug
-				log.debug('uidMultipliers: \n', uidMultipliers);
 				// compute multiplied votes
 				return Promise
 					.map(Object.keys(votes), typeKey => {
@@ -195,11 +183,6 @@ module.exports = class Application {
 					});
 			})
 			.then(multipliedVotes => {
-				// TODO: debug
-				log.debug('multipliedVotes\n', multipliedVotes);
-				// TODO: debug
-				log.debug('last chain in calculateVotesSummary: \n', Date.now() - start);
-
 				return setObject(rKey + this.tid + ':summary', multipliedVotes)
 					.thenReturn(multipliedVotes);
 			});
@@ -341,14 +324,10 @@ module.exports = class Application {
 				});
 			})
 			.then(() => {
-				// TODO: debug
-				console.debug('getUserFields');
 				return getUserFields(uid, ['username', 'userslug'])
 					.then(userFields => {
-						// TODO: debug
 						resolver.username = userFields.username;
 						resolver.userslug = userFields.userslug;
-						console.debug('userFields\n', userFields);
 					});
 			})
 			.then(() => {

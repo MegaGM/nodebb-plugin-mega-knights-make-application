@@ -3,7 +3,7 @@ $(document).on('ready', function (e) {
 	 * localStorage manipulations
 	 * ===============================================*/
 	var storagePrefix = 'make-application:';
-	require(['make-application/localStorage'], function (store) {
+	require(['knights-make-application/localStorage'], function (store) {
 
 		function fillApplicationForm() {
 			if ('/make-application' !== window.location.pathname) return;

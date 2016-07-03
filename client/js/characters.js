@@ -8,7 +8,7 @@ $(document).on('ready', function (e) {
 		var el = $(e.target),
 			game = el.closest('[data-game]').attr('data-game');
 
-		require(['handlebars', 'make-application/templates'], function (Handlebars) {
+		require(['handlebars', 'knights-make-application/templates'], function (Handlebars) {
 			var html = Handlebars.partials['characters/' + game]({
 				charI: ++charI
 			});
