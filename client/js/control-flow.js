@@ -40,12 +40,14 @@ $(document).on('ready', function (e) {
 	$(document).on('click', '.accept-instruction-btn', function (e) {
 		$('.welcome-message-layout').hide();
 		$('.statute-layout').show();
+		window.scrollTo(0, 0);
 	});
 
 	// second step
 	$(document).on('click', '.accept-statute-btn', function (e) {
 		$('.statute-layout').hide();
 		$('.application-form-layout').show();
+		window.scrollTo(0, 0);
 	});
 
 	$(document).on('change', '.accept-statute-checkbox', function (e) {

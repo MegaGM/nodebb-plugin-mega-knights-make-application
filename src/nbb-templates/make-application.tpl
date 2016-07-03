@@ -32,7 +32,7 @@
 					<button class="btn btn-info accept-statute-btn" disabled="disabled">Продолжить</button>
 					<div class="checkbox-inline">
 						<label>
-							<input type="checkbox" class="accept-statute-checkbox"> Я клянусь блюсти Кодекс Рыцарей
+							<input type="checkbox" class="accept-statute-checkbox"> Я даю своё слово блюсти Кодекс Рыцарей
 						</label>
 					</div>
 				</div>

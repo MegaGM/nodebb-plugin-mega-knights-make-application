@@ -126,7 +126,7 @@
 				<br>
 				{{#if areas}}
 					<div id="contact-skype" class="form-control">
-						{{areas.contact-skype}}
+						{{#fill areas.contact-skype}}{{/fill}}
 					</div>
 				{{else}}
 					<input id="contact-skype" class="form-control" type="text" placeholder="myskypelogin">
