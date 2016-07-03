@@ -17,9 +17,9 @@ let // logger
 log4js.configure(logOptions);
 
 let
-	apbCid = 14,
+	apbCid = 23,
 	bnsCid = 22,
-	gtaCid = 9;
+	gtaCid = 24;
 let // actual config
 	config = {
 	logOptions: logOptions,

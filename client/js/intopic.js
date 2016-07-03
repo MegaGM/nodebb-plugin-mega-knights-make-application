@@ -85,7 +85,7 @@
 		}, function (err, summary) {
 			if ('break' === summary || err) return;
 			if (!summary || !summary.votes || !summary.status)
-				return console.log('no summary');
+				return console.error('no summary');
 			processSummary(summary);
 			setupTooltips();
 		});

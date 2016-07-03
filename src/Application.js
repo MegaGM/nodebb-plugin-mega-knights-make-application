@@ -222,7 +222,6 @@ module.exports = class Application {
 			sortedSetRemove(rKey + this.tid + ':votes' + ':jellyfish', uid),
 			this.calculateVotesSummary(),
 			(a, b, c, votesSummary) => {
-				log.debug('vote negative: \n', a, b, c, votesSummary);
 				return votesSummary;
 			}
 		);
