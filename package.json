@@ -1,33 +1,33 @@
 {
-	"name": "nodebb-plugin-mega-knights-make-application",
-	"version": "0.0.40",
-	"description": "Make application page for Knights site",
-	"nbbpm": {
-		"compatibility": "^1.0.0"
-	},
-	"main": "library.js",
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/MegaGM/nodebb-plugin-mega-knights-make-application.git"
-	},
-	"author": "",
-	"license": "Apache-2.0",
-	"bugs": {
-		"url": "https://github.com/MegaGM/nodebb-plugin-mega-knights-make-application/issues"
-	},
-	"homepage": "https://github.com/MegaGM/nodebb-plugin-mega-knights-make-application#readme",
-	"dependencies": {
-		"nodebb-plugin-frontend-lodash": "^0",
-		"bluebird": "^3.4.1",
-		"handlebars": "^4.0.5",
-		"jsonwebtoken": "^7.0.1",
-		"lodash": "^4",
-		"validator": "^5.4.0"
-	},
-	"peerDependencies": {
-		"nodebb-plugin-frontend-lodash": "^0"
-	}
+  "name": "nodebb-plugin-mega-knights-make-application",
+  "version": "0.0.41",
+  "description": "Make application page for Knights site",
+  "nbbpm": {
+    "compatibility": "^1.0.0"
+  },
+  "main": "library.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MegaGM/nodebb-plugin-mega-knights-make-application.git"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/MegaGM/nodebb-plugin-mega-knights-make-application/issues"
+  },
+  "homepage": "https://github.com/MegaGM/nodebb-plugin-mega-knights-make-application#readme",
+  "dependencies": {
+    "nodebb-plugin-frontend-lodash": "^0",
+    "bluebird": "^3.4.1",
+    "handlebars": "^4.0.5",
+    "jsonwebtoken": "^7.0.1",
+    "lodash": "^4",
+    "validator": "^5.4.0"
+  },
+  "peerDependencies": {
+    "nodebb-plugin-frontend-lodash": "^0"
+  }
 }
