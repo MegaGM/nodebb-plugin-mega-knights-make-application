@@ -32,7 +32,7 @@
 						<br>
 						{{#if char}}
 							<div id="bns-char-{{charI}}-renames" class="form-control">
-								{{char.bns-char-renames}}
+								{{#fill char.bns-char-renames}}{{/fill}}
 							</div>
 						{{else}}
 							<input id="bns-char-{{charI}}-renames" class="form-control" type="text" placeholder="ShiniDesu, Dopefish">
@@ -51,15 +51,15 @@
 						<br>
 						{{#if char}}
 							<div id="bns-char-{{charI}}-server" class="form-control">
-								{{char.bns-char-server}}
+								{{#capitalize char.bns-char-server}}{{/capitalize}}
 							</div>
 						{{else}}
 							<select id="bns-char-{{charI}}-server" class="form-control">
 								<option value="not-selected" selected="selected">...</option>
-								<option value="agate" selected="selected">Агат</option>
-								<option value="emerald" selected="selected">Изумруд</option>
-								<option value="ruby" selected="selected">Рубин</option>
-								<option value="topaz" selected="selected">Топаз</option>
+								<option value="агат">Агат</option>
+								<option value="изумруд">Изумруд</option>
+								<option value="рубин">Рубин</option>
+								<option value="топаз">Топаз</option>
 							</select>
 						{{/if}}
 					</div>
@@ -71,13 +71,13 @@
 						<br>
 						{{#if char}}
 							<div id="bns-char-{{charI}}-faction" class="form-control">
-								{{char.bns-char-faction}}
+								{{#capitalize char.bns-char-faction}}{{/capitalize}}
 							</div>
 						{{else}}
 							<select id="bns-char-{{charI}}-faction" class="form-control">
 								<option value="not-selected" selected="selected">...</option>
-								<option value="murim">Мурим</option>
-								<option value="honchon">Хончон</option>
+								<option value="мурим">Мурим</option>
+								<option value="хончон">Хончон</option>
 							</select>
 						{{/if}}
 					</div>
@@ -92,7 +92,7 @@
 								{{char.bns-char-level}}
 							</div>
 						{{else}}
-							<select id="bns-char-{{charI}}-level" class="bns-char-level form-control">
+							<select id="bns-char-{{charI}}-level" class="form-control">
 								<option value="not-selected" selected="selected">...</option>
 								<option value="1">1</option>
 								<option value="2">2</option>

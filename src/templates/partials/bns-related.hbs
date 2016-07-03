@@ -4,72 +4,116 @@
 	{{! Основные крафтовые профессии ? (минимальный 3-й уровень) }}
 	{{! Какой у вас опыт в данной игре? }}
 
-	<div class="form-group form-inline">
-		<label>Что предпочитаете?</label>
-		<br>
-		<div class="checkbox">
-			<label for="bns-i-play-pvp">
-				{{#if areas}}
-					<input type="checkbox" id="bns-i-play-pvp" disabled="disabled" {{#if areas.bns-i-play-pvp}} checked="checked" {{/if}}> PVP
-				{{else}}
-					<input type="checkbox" id="bns-i-play-pvp"> PVP
-				{{/if}}
-			</label>
+	<div class="row">
+		<div class="col-xs-12 col-sm-6">
+			<div class="row no-gutters">
+				<div class="col-xs-9">
+					<div class="form-group">
+						<label for="bns-expirience">Какой у Вас опыт в игре?</label>
+						<br>
+						{{#if areas}}
+							<div id="bns-expirience" class="form-control">
+								{{#fill areas.bns-expirience}}{{/fill}}
+							</div>
+						{{else}}
+							<textarea id="bns-expirience" class="form-control" rows="1" placeholder="Играл на корее итд"></textarea>
+						{{/if}}
+					</div>
+				</div>
+				<div class="col-xs-3">
+					<div class="form-group">
+						<label for="bns-fps">Средний FPS</label>
+						<br>
+						{{#if areas}}
+							<div id="bns-fps" class="form-control"> {{areas.bns-fps}} </div>
+						{{else}}
+							<select id="bns-fps" class="form-control">
+								<option value="not-selected" selected="selected">...</option>
+								<option value="<30">&lt; 30</option>
+								<option value=">30">&gt; 30</option>
+								<option value=">35">&gt; 35</option>
+								<option value=">40">&gt; 40</option>
+								<option value=">45">&gt; 45</option>
+								<option value=">50">&gt; 50</option>
+								<option value=">55">&gt; 55</option>
+								<option value=">60">&gt; 60</option>
+							</select>
+						{{/if}}
+					</div>
+				</div>
+			</div>
 		</div>
-		<div class="checkbox">
-			<label for="bns-i-play-pve">
-				{{#if areas}}
-					<input type="checkbox" id="bns-i-play-pve" disabled="disabled" {{#if areas.bns-i-play-pve}} checked="checked" {{/if}}> PVE
-				{{else}}
-					<input type="checkbox" id="bns-i-play-pve"> PVE
-				{{/if}}
-			</label>
-		</div>
-	</div>
 
-	<div class="form-group form-inline">
-		<label>В какое время вы находитесь в игре?</label>
-		<br>
-		<div class="checkbox">
-			<label for="bns-i-play-morning">
-				{{#if areas}}
-					<input type="checkbox" id="bns-i-play-morning" disabled="disabled" {{#if areas.bns-i-play-morning}} checked="checked" {{/if}}> Утром
-				{{else}}
-					<input type="checkbox" id="bns-i-play-morning"> Утром
-				{{/if}}
-			</label>
+		<div class="col-xs-12 col-sm-6">
+			<div class="form-group form-inline">
+				<label>Что предпочитаете?</label>
+				<br>
+				<div class="checkbox">
+					<label for="bns-i-play-pvp">
+						{{#if areas}}
+							<input type="checkbox" id="bns-i-play-pvp" disabled="disabled" {{#if areas.bns-i-play-pvp}} checked="checked" {{/if}}> PVP
+						{{else}}
+							<input type="checkbox" id="bns-i-play-pvp"> PVP
+						{{/if}}
+					</label>
+				</div>
+				<div class="checkbox">
+					<label for="bns-i-play-pve">
+						{{#if areas}}
+							<input type="checkbox" id="bns-i-play-pve" disabled="disabled" {{#if areas.bns-i-play-pve}} checked="checked" {{/if}}> PVE
+						{{else}}
+							<input type="checkbox" id="bns-i-play-pve"> PVE
+						{{/if}}
+					</label>
+				</div>
+			</div>
 		</div>
-		<div class="checkbox">
-			<label for="bns-i-play-day">
-				{{#if areas}}
-					<input type="checkbox" id="bns-i-play-day" disabled="disabled" {{#if areas.bns-i-play-day}} checked="checked" {{/if}}> Днём
-				{{else}}
-					<input type="checkbox" id="bns-i-play-day"> Днём
-				{{/if}}
-			</label>
-		</div>
-		<div class="checkbox">
-			<label for="bns-i-play-evening">
-				{{#if areas}}
-					<input type="checkbox" id="bns-i-play-evening" disabled="disabled" {{#if areas.bns-i-play-evening}} checked="checked" {{/if}}> Вечером
-				{{else}}
-					<input type="checkbox" id="bns-i-play-evening"> Вечером
-				{{/if}}
-			</label>
-		</div>
-		<div class="checkbox">
-			<label for="bns-i-play-night">
-				{{#if areas}}
-					<input type="checkbox" id="bns-i-play-night" disabled="disabled" {{#if areas.bns-i-play-night}} checked="checked" {{/if}}> Ночью
-				{{else}}
-					<input type="checkbox" id="bns-i-play-night"> Ночью
-				{{/if}}
-			</label>
+
+		<div class="col-xs-12 col-sm-6">
+			<div class="form-group form-inline">
+				<label>В какое время вы находитесь в игре?</label>
+				<br>
+				<div class="checkbox">
+					<label for="bns-i-play-morning">
+						{{#if areas}}
+							<input type="checkbox" id="bns-i-play-morning" disabled="disabled" {{#if areas.bns-i-play-morning}} checked="checked" {{/if}}> Утром
+						{{else}}
+							<input type="checkbox" id="bns-i-play-morning"> Утром
+						{{/if}}
+					</label>
+				</div>
+				<div class="checkbox">
+					<label for="bns-i-play-day">
+						{{#if areas}}
+							<input type="checkbox" id="bns-i-play-day" disabled="disabled" {{#if areas.bns-i-play-day}} checked="checked" {{/if}}> Днём
+						{{else}}
+							<input type="checkbox" id="bns-i-play-day"> Днём
+						{{/if}}
+					</label>
+				</div>
+				<div class="checkbox">
+					<label for="bns-i-play-evening">
+						{{#if areas}}
+							<input type="checkbox" id="bns-i-play-evening" disabled="disabled" {{#if areas.bns-i-play-evening}} checked="checked" {{/if}}> Вечером
+						{{else}}
+							<input type="checkbox" id="bns-i-play-evening"> Вечером
+						{{/if}}
+					</label>
+				</div>
+				<div class="checkbox">
+					<label for="bns-i-play-night">
+						{{#if areas}}
+							<input type="checkbox" id="bns-i-play-night" disabled="disabled" {{#if areas.bns-i-play-night}} checked="checked" {{/if}}> Ночью
+						{{else}}
+							<input type="checkbox" id="bns-i-play-night"> Ночью
+						{{/if}}
+					</label>
+				</div>
+			</div>
 		</div>
 	</div>
 
 	<div class="row">
-
 		<div class="col-xs-12 col-md-8">
 			<div class="form-group">
 				<label for="bns-previous-clans">Названия всех кланов, в которых состояли все Ваши персонажи</label>

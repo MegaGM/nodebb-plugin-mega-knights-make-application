@@ -150,6 +150,16 @@
 					max: 100
 				}
 			},
+			'bns-expirience': {
+				'required': false,
+				'length': {
+					min: 3,
+					max: 512
+				}
+			},
+			'bns-fps': {
+				'required': true
+			},
 			'bns-i-play-pvp': {
 				required: false
 			},
