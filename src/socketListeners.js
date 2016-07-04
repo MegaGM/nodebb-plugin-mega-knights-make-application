@@ -30,6 +30,7 @@ require('../client/templates');
  * Promisify
  * ===============================================*/
 let
+	io = SocketIndex.server,
 	joinGroup = Promise.promisify(groups.join),
 	leaveGroup = Promise.promisify(groups.leave),
 	dbGetObject = Promise.promisify(db.getObject),
@@ -67,23 +68,18 @@ socketListeners.resolve = (socket, data, callback) => {
 		now = Date.now(),
 		groupNames = config.groupNames,
 		uidApplicant = 0,
-		memberOf = {};
+		memberOf = {},
+		grant = ('approve' === type);
 
 	return checkCid(tid)
-		.then(() => {
-			return getTopicField(tid, 'uid')
-		})
-		.then(_uidApplicant => {
-			uidApplicant = _uidApplicant;
-			return isMemberOfGroups(uidApplicant, groupNames);
-		})
+		.then(() => getTopicField(tid, 'uid'))
+		.then(_uidApplicant => uidApplicant = _uidApplicant)
+		.then(() => isMemberOfGroups(uidApplicant, groupNames))
 		.then(membershipList => {
-			// find out users' groups
-			return _.each(membershipList, (isMember, groupI) => {
+			// fill memberOf hash
+			_.each(membershipList, (isMember, groupI) => {
 				memberOf[groupNames[groupI]] = isMember;
 			});
-		})
-		.then(() => {
 			// decide if the user has permissions to get controls
 			if (memberOf['Лидер'] || memberOf['Генералы'] || memberOf['Офицеры'])
 				return 'mod';
@@ -91,47 +87,31 @@ socketListeners.resolve = (socket, data, callback) => {
 				return false;
 		})
 		.then(perm => {
-			if (!perm) {
-				let error = new Error();
-				error.code = 'break';
-				throw error;
-			}
+			if (!perm) throw new Error('break');
 		})
 		.then(() => {
 			a = new Application(tid);
 			return a[type](now, uidResolver);
 		})
-		.then(() => {
-			// join or leave group
-			return getTopicField(tid, 'cid')
-				.then(cid => {
-					let groupsToJoinOrLeave = null;
-					_.each(config.groupsByCid, (groups, key) => {
-						if (key !== cid) return;
-						groupsToJoinOrLeave = groups;
-					});
-					return groupsToJoinOrLeave;
-				})
-				.then(groups => {
-					// groups = ['Рыцари','APB'];
-					return isMemberOfGroups(uidApplicant, groups)
-						.then(membership => {
-							// membership = [false,false];
-							let grantToJoin = ('approve' === type); // true
-							let grantToLeave = !('approve' === type); // true
+		.then(() => getTopicField(tid, 'cid'))
+		.then(cid => grant ?
+			config.groupsToJoinByCid[cid] : config.groupsToLeaveByCid[cid]
+		)
+		.then(groups => {
+			return isMemberOfGroups(uidApplicant, groups)
+				.then(membership => {
+					// membership = [false,false];
 
-							return Promise.map(groups, (groupName, groupI) => {
-								if (grantToJoin && !membership[groupI])
-									return joinGroup(groupName, uidApplicant);
-								if (grantToLeave && membership[groupI])
-									return leaveGroup(groupName, uidApplicant);
-								return 'noop';
-							});
-						});
+					return Promise.map(groups, (groupName, groupI) => {
+						if (grant && !membership[groupI])
+							return joinGroup(groupName, uidApplicant);
+						if (!grant && membership[groupI])
+							return leaveGroup(groupName, uidApplicant);
+					});
 				});
 		})
 		.then(() => {
-			// whether or not topic was locked
+			// whether or not topic was locked, huh?
 			let topicIsLocked = !('pend' === type);
 			return {
 				topicIsLocked
@@ -145,17 +125,17 @@ socketListeners.resolve = (socket, data, callback) => {
 				callback(null);
 
 			// update UI
-			SocketIndex.server.sockets.emit('plugins.makeApplication.event.resolve', {
+			io.sockets.emit('plugins.makeApplication.event.resolve', {
 				tid
 			});
 
 			if (result.topicIsLocked) {
-				SocketIndex.server.sockets.emit('event:topic_locked', {
+				io.sockets.emit('event:topic_locked', {
 					tid,
 					isLocked: result.topicIsLocked
 				});
 			} else {
-				SocketIndex.server.sockets.emit('event:topic_unlocked', {
+				io.sockets.emit('event:topic_unlocked', {
 					tid,
 					isLocked: result.topicIsLocked
 				});
@@ -196,7 +176,7 @@ socketListeners.vote = (socket, data, callback) => {
 				return callback(true, 'break');
 			else
 				callback(null);
-			SocketIndex.server.sockets.emit('plugins.makeApplication.event.vote', {
+			io.sockets.emit('plugins.makeApplication.event.vote', {
 				tid
 			});
 		});
@@ -269,16 +249,12 @@ function checkCid(tid) {
 			return _.some(config.gameCids, gameCid => cid == gameCid);
 		})
 		.then(ok => {
-			if (!ok) {
-				let error = new Error();
-				error.code = 'break';
-				throw error;
-			}
-		})
+			if (!ok) throw new Error('break');
+		});
 }
 
 function catchBreak(err) {
-	if ('break' !== err.code) throw err;
+	if ('break' !== err.message) throw err;
 	return false;
 }
 module.exports = socketListeners;

@@ -5,14 +5,14 @@
 	socket.on('plugins.makeApplication.event.vote', function (data) {
 		if (!$('[data-tid]').length) return;
 		var tid = $('[data-tid]').attr('data-tid');
-		if (!tid) return;
+		if (!tid || tid != data.tid) return;
 		getSummary(data.tid);
 	});
 
 	socket.on('plugins.makeApplication.event.resolve', function (data) {
 		if (!$('[data-tid]').length) return;
 		var tid = $('[data-tid]').attr('data-tid');
-		if (!tid) return;
+		if (!tid || tid != data.tid) return;
 		getSummary(data.tid);
 		getControls(data.tid);
 	});
