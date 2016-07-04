@@ -74,7 +74,7 @@ socketListeners.resolve = (socket, data, callback) => {
 	return checkCid(tid)
 		.then(() => getTopicField(tid, 'uid'))
 		.then(_uidApplicant => uidApplicant = _uidApplicant)
-		.then(() => isMemberOfGroups(uidApplicant, groupNames))
+		.then(() => isMemberOfGroups(uidResolver, groupNames))
 		.then(membershipList => {
 			// fill memberOf hash
 			_.each(membershipList, (isMember, groupI) => {
@@ -101,12 +101,20 @@ socketListeners.resolve = (socket, data, callback) => {
 			return isMemberOfGroups(uidApplicant, groups)
 				.then(membership => {
 					// membership = [false,false];
+					// INFO: to let mega-teamspeak process groups join & leave events w/o errors
+					// we have to delay these actions significantly :(
+					let delay = 0;
 
 					return Promise.map(groups, (groupName, groupI) => {
+						delay = delay + 100;
+
 						if (grant && !membership[groupI])
-							return joinGroup(groupName, uidApplicant);
+							return Promise.delay(delay)
+								.then(() => joinGroup(groupName, uidApplicant));
+
 						if (!grant && membership[groupI])
-							return leaveGroup(groupName, uidApplicant);
+							return Promise.delay(delay)
+								.then(() => leaveGroup(groupName, uidApplicant));
 					});
 				});
 		})
