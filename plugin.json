@@ -27,8 +27,5 @@
 		"hook": "filter:parse.post",
 		"method": "parseApplication",
 		"priority": 7
-	}, {
-		"hook": "filter:post.getPosts",
-		"method": "getPosts"
 	}]
 }

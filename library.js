@@ -46,10 +46,6 @@
 				topicData.uid = topicData.realUID;
 			callback(null, topicData);
 		},
-		getPosts: function (data, callback) {
-			// IDEA: make a filter for sensitive info based on req.uid's Рыцари group membership
-			callback(null, data);
-		},
 		parseApplication: application.parseApplication
 	};
 

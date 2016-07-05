@@ -141,7 +141,7 @@ module.exports = class Application {
 					.map(groupNames, groupName => {
 						// get an array of membership lists
 						return isMembersOfGroup(uids, groupName);
-					})
+					});
 			})
 			.then(membershipLists => {
 				// compute memberOf hash
