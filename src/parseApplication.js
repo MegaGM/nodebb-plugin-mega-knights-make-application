@@ -4,11 +4,8 @@ let
 	_ = require('lodash'),
 	jwt = require('jsonwebtoken'),
 	Promise = require('bluebird'),
-	async = require.main.require('async'),
-	db = require.main.require('./src/database/redis'),
-	groups = require.main.require('./src/groups'),
-	Application = require('./Application'),
-	validation = require('../client/js/validation');
+	plugins = Promise.promisifyAll(require.main.require('./src/plugins')),
+	Application = require('./Application');
 let // logger
 	log4js = require('log4js'),
 	log = log4js.getLogger('parseApplication');
@@ -47,6 +44,14 @@ function parseApplication(payload, callback) {
 	 * ===============================================*/
 	let a = new Application(token.tid);
 	a.getAreas()
+		.then(areas => {
+			// parse markdown
+			return plugins.fireHookAsync('filter:parse.raw', areas['personal-aboutme'])
+				.then(parsedAboutme => {
+					areas['personal-aboutme'] = parsedAboutme;
+					return areas;
+				});
+		})
 		.then(areas => {
 			// render application for topic
 			return Handlebars.templates['application-form-topic']({
