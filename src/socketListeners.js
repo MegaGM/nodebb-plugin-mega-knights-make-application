@@ -93,36 +93,44 @@ socketListeners.resolve = (socket, data, callback) => {
 			a = new Application(tid);
 			return a[type](now, uidResolver);
 		})
-		.then(() => getTopicField(tid, 'cid'))
-		.then(cid => grant ?
-			config.groupsToJoinByCid[cid] : config.groupsToLeaveByCid[cid]
-		)
-		.then(groups => {
+		// leave groups
+		.then(() => {
+			let groups = config.groupsToLeave;
 			return isMemberOfGroups(uidApplicant, groups)
 				.then(membership => {
-					// membership = [false,false];
-					// INFO: to let mega-teamspeak process groups join & leave events w/o errors
-					// we have to delay these actions significantly :(
 					let delay = 0;
-
 					return Promise.map(groups, (groupName, groupI) => {
 						delay = delay + 100;
-
-						if (grant && !membership[groupI])
-							return Promise.delay(delay)
-								.then(() => joinGroup(groupName, uidApplicant));
-
-						if (!grant && membership[groupI])
+						if (membership[groupI])
 							return Promise.delay(delay)
 								.then(() => leaveGroup(groupName, uidApplicant));
+						else
+							return;
+					});
+				});
+		})
+		// join groups
+		.then(() => getTopicField(tid, 'cid'))
+		.then(cid => {
+			if (!grant) return;
+			let groups = config.groupsToJoin[cid];
+			return isMemberOfGroups(uidApplicant, groups)
+				.then(membership => {
+					let delay = 0;
+					return Promise.map(groups, (groupName, groupI) => {
+						delay = delay + 100;
+						if (!membership[groupI])
+							return Promise.delay(delay)
+								.then(() => joinGroup(groupName, uidApplicant));
+						else
+							return;
 					});
 				});
 		})
 		.then(() => {
 			// whether or not topic was locked, huh?
-			let topicIsLocked = !('pend' === type);
 			return {
-				topicIsLocked
+				topicIsLocked: !('pend' === type)
 			};
 		})
 		.catch(catchBreak) // catch bad data.tid

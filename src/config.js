@@ -40,16 +40,12 @@ let // actual config
 		'Генералы',
 		'Лидер'
 	],
-	groupsToJoinByCid: {
+	groupsToJoin: {
 		[apbCid]: ['Рыцари', 'APB'],
 		[bnsCid]: ['Рыцари', 'BNS'],
 		[gtaCid]: ['Рыцари', 'GTA']
 	},
-	groupsToLeaveByCid: {
-		[apbCid]: ['Рыцари', 'APB', 'BNS', 'GTA'],
-		[bnsCid]: ['Рыцари', 'APB', 'BNS', 'GTA'],
-		[gtaCid]: ['Рыцари', 'APB', 'BNS', 'GTA']
-	},
+	groupsToLeave: ['Рыцари', 'Соратники', 'APB', 'BNS', 'GTA'],
 	voteMultipliers: {
 		'Рыцари': 1,
 		'Рекрутеры': 10,
