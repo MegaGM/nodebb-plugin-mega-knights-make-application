@@ -44,6 +44,8 @@ $(document).on('ready', function (e) {
 		}
 
 		form.off('submit').submit(function () {
+			// TODO: debug
+			console.log('this: ', $(this));
 			// setup spinner to indicate upload progress
 			placeholder.find('.icon')
 				.removeClass('fa-cloud-upload')

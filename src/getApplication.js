@@ -24,20 +24,33 @@ function getStatute() {
 	});
 }
 
-function parsePartial(partial) {
+function parsePartial(partial, _data) {
+	let data = _data || {};
 	return new Promise((resolve, reject) => {
-		let html = Handlebars.partials[partial]({});
+		let html = Handlebars.partials[partial](data);
 		resolve(html);
 	});
 }
 
 function getApplicationPage(req, res, next) {
+	let templateData = {
+		apb: {
+			gameCid: config.gameCids.apb
+		},
+		bns: {
+			gameCid: config.gameCids.bns
+		},
+		gta: {
+			gameCid: config.gameCids.gta
+		}
+	};
+
 	Promise.join(
 			getStatute(),
 			parsePartial('personal-related'),
-			parsePartial('apb-related'),
-			parsePartial('bns-related'),
-			parsePartial('gta-related'),
+			parsePartial('apb-related', templateData.apb),
+			parsePartial('bns-related', templateData.bns),
+			parsePartial('gta-related', templateData.gta),
 			(statuteParsed, personal, apb, bns, gta) => {
 				res.render('make-application', {
 					title: config.title,

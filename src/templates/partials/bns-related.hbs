@@ -1,4 +1,4 @@
-<div class="bns-related" data-game="bns">
+<div class="bns-related" data-game="bns" data-game-cid="{{gameCid}}">
 	<hr>
 	<h3 class="header">Blade and Soul</h3>
 	{{! Основные крафтовые профессии ? (минимальный 3-й уровень) }}
@@ -150,6 +150,7 @@
 					<div class="screenshot-placeholder"> <i class="icon fa fa-cloud-upload fa-3x"></i>
 						<input id="bns-screenshot-url-lobby" class="screenshot-url" type="text">
 						<form class="screenshot-form" action="/api/post/upload" method="post" enctype="multipart/form-data">
+							<input type="hidden" name="cid" value="{{gameCid}}">
 							<input class="screenshot-fileinput" type="file" name="files[]"> </form>
 					</div>
 				{{/if}}

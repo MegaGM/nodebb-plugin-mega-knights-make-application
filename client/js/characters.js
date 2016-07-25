@@ -6,11 +6,13 @@ $(document).on('ready', function (e) {
 	// on adding character
 	$(document).on('click', '.application-form-layout .charlist-add', function (e) {
 		var el = $(e.target),
-			game = el.closest('[data-game]').attr('data-game');
+			game = el.closest('[data-game]').attr('data-game'),
+			gameCid = el.closest('[data-game-cid]').attr('data-game-cid');
 
 		require(['handlebars', 'knights-make-application/templates'], function (Handlebars) {
 			var html = Handlebars.partials['characters/' + game]({
-				charI: ++charI
+				charI: ++charI,
+				gameCid: gameCid
 			});
 			el.closest('[data-game]').find('.charlist').append(html);
 		});

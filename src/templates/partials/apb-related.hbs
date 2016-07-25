@@ -1,4 +1,4 @@
-<div class="apb-related" data-game="apb">
+<div class="apb-related" data-game="apb" data-game-cid="{{gameCid}}">
 	<hr>
 	<h3 class="header">APB: Reloaded</h3>
 
@@ -44,6 +44,7 @@
 						<input id="apb-screenshot-url-lobby" class="screenshot-url" type="text">
 
 						<form class="screenshot-form" action="/api/post/upload" method="post" enctype="multipart/form-data">
+							<input type="hidden" name="cid" value="{{gameCid}}">
 							<input class="screenshot-fileinput" type="file" name="files[]">
 						</form>
 					</div>
