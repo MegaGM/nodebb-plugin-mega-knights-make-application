@@ -127,7 +127,7 @@ $(document).on('ready', function (e) {
 
 		if (!errors.noErrors) return showErrors(errors);
 
-		require(['knights-make-application/validator', 'knights-make-application/validation', 'csrf'], function (validator, validation, csrf) {
+		require(['knights-make-application/validator', 'knights-make-application/validation'], function (validator, validation) {
 			var rules = validation.rules,
 				getRuleName = validation.getRuleName;
 
@@ -178,7 +178,7 @@ $(document).on('ready', function (e) {
 					type: 'POST',
 					contentType: 'application/json; charset=utf-8',
 					headers: {
-						'x-csrf-token': csrf.get()
+						'x-csrf-token': config.csrf_token
 					},
 					dataType: 'json',
 					data: JSON.stringify({
