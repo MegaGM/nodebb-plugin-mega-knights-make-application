@@ -92,6 +92,7 @@
 	}
 
 	function processSummary(summary) {
+		console.log('summary: ', summary);
 		// compute progress bars' width
 		var minWidth = 5; // percents
 		var

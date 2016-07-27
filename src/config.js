@@ -51,7 +51,7 @@ let // actual config
 		'Рекрутеры': 10,
 		'Офицеры': 30,
 		'Генералы': 75,
-		'Лидер': 100
+		'Лидер': 77
 	},
 	gameCheckboxRegexp: /i-choose-(\w{3})/i,
 	gameCharRegexp: /(\w{3})-char-(\d+)/i,

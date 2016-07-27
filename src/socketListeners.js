@@ -41,8 +41,6 @@ let
  * Module methods
  * ===============================================*/
 socketListeners.test = (socket, data, callback) => {
-	let a = new Application(data.tid);
-	a.calculateVotesSummary();
 	callback(null, 'meow');
 };
 
@@ -239,21 +237,6 @@ socketListeners.getSummary = (socket, data, callback) => {
 			if (!summary) return callback(true, 'break');
 			callback(null, summary);
 		});
-};
-
-socketListeners.getVotersPositive = (socket, data, callback) => {
-	// TODO: implement
-	callback(null);
-};
-
-socketListeners.getVotersNegative = (socket, data, callback) => {
-	// TODO: implement
-	callback(null);
-};
-
-socketListeners.getVotersJellyfish = (socket, data, callback) => {
-	// TODO: implement
-	callback(null);
 };
 
 /* ================================================

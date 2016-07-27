@@ -10,10 +10,10 @@ let // npm
 	_ = require('lodash'),
 	Promise = require('bluebird');
 let // NodeBB
-	db = require.main.require('./src/database'),
-	groups = require.main.require('./src/groups'),
-	topics = require.main.require('./src/topics'),
-	user = require.main.require('./src/user');
+	db = Promise.promisifyAll(require.main.require('./src/database')),
+	groups = Promise.promisifyAll(require.main.require('./src/groups')),
+	topics = Promise.promisifyAll(require.main.require('./src/topics')),
+	user = Promise.promisifyAll(require.main.require('./src/user'));
 let // logger
 	log4js = require('log4js'),
 	log = log4js.getLogger('Application');
@@ -24,13 +24,10 @@ let // logger
 let
 	lockTopic = Promise.promisify(topics.tools.lock),
 	unlockTopic = Promise.promisify(topics.tools.unlock),
+	getUserField = Promise.promisify(user.getUserField),
 	getUserFields = Promise.promisify(user.getUserFields),
 	isMemberOfGroups = Promise.promisify(groups.isMemberOfGroups),
 	isMembersOfGroup = Promise.promisify(groups.isMembers),
-	getKey = Promise.promisify(db.get),
-	setKey = Promise.promisify(db.set),
-	getObject = Promise.promisify(db.getObject),
-	setObject = Promise.promisify(db.setObject),
 	sortedSetAdd = Promise.promisify(db.sortedSetAdd),
 	sortedSetRemove = Promise.promisify(db.sortedSetRemove),
 	getSortedSetRevRangeWithScores = Promise.promisify(db.getSortedSetRevRangeWithScores);
@@ -52,12 +49,12 @@ module.exports = class Application {
 	}
 
 	getAreas() {
-		return getKey(rKey + this.tid + ':application')
+		return db.getAsync(rKey + this.tid + ':application')
 			.then(JSON.parse);
 	}
 
 	setAreas(areas) {
-		return setKey(rKey + this.tid + ':application', JSON.stringify(areas));
+		return db.setAsync(rKey + this.tid + ':application', JSON.stringify(areas));
 	}
 
 	getControls(uid) {
@@ -82,7 +79,7 @@ module.exports = class Application {
 			})
 			.then(perm => {
 				if (!perm) return 'break';
-				return getObject(rKey + this.tid + ':status')
+				return db.getObjectAsync(rKey + this.tid + ':status')
 					.then(status => {
 						status = typecastStatus(status);
 						return {
@@ -100,11 +97,13 @@ module.exports = class Application {
 		let summary = {};
 
 		return Promise.join(
-			getObject(rKey + this.tid + ':status'),
-			getObject(rKey + this.tid + ':summary'),
-			(status, votesSummary) => {
+			db.getObjectAsync(rKey + this.tid + ':status'),
+			db.getObjectAsync(rKey + this.tid + ':summary'),
+			this.getVoters(),
+			(status, votesSummary, voters) => {
 				summary.status = typecastStatus(status);
 				summary.votes = votesSummary;
+				summary.voters = voters;
 				if (!summary.votes ||
 					!summary.votes.positive || !summary.votes.negative || !summary.votes.jellyfish)
 					return this.calculateVotesSummary()
@@ -183,7 +182,7 @@ module.exports = class Application {
 					});
 			})
 			.then(multipliedVotes => {
-				return setObject(rKey + this.tid + ':summary', multipliedVotes)
+				return db.setObjectAsync(rKey + this.tid + ':summary', multipliedVotes)
 					.thenReturn(multipliedVotes);
 			});
 	}
@@ -201,6 +200,40 @@ module.exports = class Application {
 				};
 			}
 		);
+	}
+
+	getVoters() {
+		return this.getVotes()
+			// { pos: [{value: '1' //uid, score: '1452982342' //time}], neg: ..., jell: ... }
+			.then(votesSummary => {
+				return Promise.map(Object.keys(votesSummary), typeKey => {
+					// typeKey: pos, neg, jell
+					return Promise.map(votesSummary[typeKey], voter => {
+						let uid = voter.value;
+						// voter = {value: '1' //uid, score: '1452982342' //time}
+						return Promise.join(
+							user.getUserFieldsAsync(uid, ['username', 'userslug']),
+							groups.isMemberOfGroupsAsync(uid, config.groupNames),
+							(username, membership) => {
+								voter.username = username;
+								voter.group = config.groupNames[membership.lastIndexOf(true)];
+								return groups.getGroupFieldsAsync(voter.group, ['labelColor'])
+									.then(data => voter.labelColor = data.labelColor)
+									.thenReturn(voter);
+							}
+						);
+					});
+				});
+			})
+			.spread((positive, negative, jellyfish) => {
+				return {
+					positive,
+					negative,
+					jellyfish
+				};
+			})
+			.then(console.log);
+		// User.getUsernamesByUids = function(uids, callback) {
 	}
 
 	votePositive(time, uid) {
@@ -250,7 +283,7 @@ module.exports = class Application {
 			sortedSetRemove(rKey + 'resolved', this.tid),
 			sortedSetRemove(rKey + 'approved', this.tid),
 			sortedSetRemove(rKey + 'rejected', this.tid),
-			setObject(rKey + this.tid + ':status', this.status),
+			db.setObjectAsync(rKey + this.tid + ':status', this.status),
 			unlockTopic(this.tid, 1),
 			this.setResolver(0)
 		);
@@ -267,7 +300,7 @@ module.exports = class Application {
 			sortedSetAdd(rKey + 'resolved', time, this.tid),
 			sortedSetRemove(rKey + 'approved', this.tid),
 			sortedSetRemove(rKey + 'rejected', this.tid),
-			setObject(rKey + this.tid + ':status', this.status),
+			db.setObjectAsync(rKey + this.tid + ':status', this.status),
 			lockTopic(this.tid, uid),
 			this.setResolver(uid)
 		);
@@ -284,7 +317,7 @@ module.exports = class Application {
 			sortedSetAdd(rKey + 'resolved', time, this.tid),
 			sortedSetAdd(rKey + 'approved', time, this.tid),
 			sortedSetRemove(rKey + 'rejected', this.tid),
-			setObject(rKey + this.tid + ':status', this.status),
+			db.setObjectAsync(rKey + this.tid + ':status', this.status),
 			lockTopic(this.tid, uid),
 			this.setResolver(uid)
 		);
@@ -301,7 +334,7 @@ module.exports = class Application {
 			sortedSetAdd(rKey + 'resolved', time, this.tid),
 			sortedSetRemove(rKey + 'approved', this.tid),
 			sortedSetAdd(rKey + 'rejected', time, this.tid),
-			setObject(rKey + this.tid + ':status', this.status),
+			db.setObjectAsync(rKey + this.tid + ':status', this.status),
 			lockTopic(this.tid, uid),
 			this.setResolver(uid)
 		);
@@ -339,7 +372,7 @@ module.exports = class Application {
 					resolver.role = 'leader';
 			})
 			.then(() => {
-				return setObject(rKey + this.tid + ':status', {
+				return db.setObjectAsync(rKey + this.tid + ':status', {
 					resolver: JSON.stringify(resolver)
 				});
 			})
