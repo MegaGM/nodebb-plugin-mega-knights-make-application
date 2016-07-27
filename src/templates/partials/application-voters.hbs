@@ -1,0 +1,15 @@
+<div class="positive">За:
+	{{#each voters.positive}}
+		<a href="/user/{{userslug}}" {{#if labelColor}} style="color: {{labelColor}}" {{/if}}>{{username}}{{#unless @last}},{{/unless}}</a>
+	{{/each}}
+</div>
+<div class="jellyfish">Медузы:
+	{{#each voters.jellyfish}}
+		<a href="/user/{{userslug}}" {{#if labelColor}} style="color: {{labelColor}}" {{/if}}>{{username}}{{#unless @last}},{{/unless}}</a>
+	{{/each}}
+</div>
+<div class="negative">Против:
+	{{#each voters.negative}}
+		<a href="/user/{{userslug}}" {{#if labelColor}} style="color: {{labelColor}}" {{/if}}>{{username}}{{#unless @last}},{{/unless}}</a>
+	{{/each}}
+</div>

@@ -33,6 +33,21 @@
 		resolve(tid, type);
 	});
 
+	$(document).on('click', '.application-votes .positive', function (e) {
+		$('.application-voters').removeClass('show-positive show-negative show-jellyfish');
+		$('.application-voters').addClass('show-positive');
+	});
+
+	$(document).on('click', '.application-votes .negative', function (e) {
+		$('.application-voters').removeClass('show-positive show-negative show-jellyfish');
+		$('.application-voters').addClass('show-negative');
+	});
+
+	$(document).on('click', '.application-votes .jellyfish', function (e) {
+		$('.application-voters').removeClass('show-positive show-negative show-jellyfish');
+		$('.application-voters').addClass('show-jellyfish');
+	});
+
 	function resolve(tid, type) {
 		socket.emit('plugins.makeApplication.resolve', {
 			tid: tid,
@@ -143,8 +158,11 @@
 
 		// re-render status
 		require(['handlebars', 'knights-make-application/templates'], function (Handlebars) {
-			var html = Handlebars.partials['application-status'](summary);
-			$('.application-status').html(html);
+			console.log('summary: ', summary);
+			var status = Handlebars.partials['application-status'](summary);
+			var voters = Handlebars.partials['application-voters'](summary);
+			$('.application-status').html(status);
+			$('.application-voters').html(voters);
 		});
 	}
 

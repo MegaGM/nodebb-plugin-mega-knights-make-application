@@ -21,16 +21,7 @@ let // logger
 /* ================================================
  * Promisify
  * ===============================================*/
-let
-	lockTopic = Promise.promisify(topics.tools.lock),
-	unlockTopic = Promise.promisify(topics.tools.unlock),
-	getUserField = Promise.promisify(user.getUserField),
-	getUserFields = Promise.promisify(user.getUserFields),
-	isMemberOfGroups = Promise.promisify(groups.isMemberOfGroups),
-	isMembersOfGroup = Promise.promisify(groups.isMembers),
-	sortedSetAdd = Promise.promisify(db.sortedSetAdd),
-	sortedSetRemove = Promise.promisify(db.sortedSetRemove),
-	getSortedSetRevRangeWithScores = Promise.promisify(db.getSortedSetRevRangeWithScores);
+topics.tools = Promise.promisifyAll(require.main.require('./src/topics').tools);
 
 module.exports = class Application {
 	constructor(tid) {
@@ -45,7 +36,7 @@ module.exports = class Application {
 	}
 
 	setCreationTime(time) {
-		return sortedSetAdd(rKey + 'created', time, this.tid);
+		return db.sortedSetAddAsync(rKey + 'created', time, this.tid);
 	}
 
 	getAreas() {
@@ -61,7 +52,7 @@ module.exports = class Application {
 		let
 			groupNames = config.groupNames,
 			memberOf = {};
-		return isMemberOfGroups(uid, groupNames)
+		return groups.isMemberOfGroupsAsync(uid, groupNames)
 			.then(membershipList => {
 				// find out users' groups
 				return _.each(membershipList, (isMember, groupI) => {
@@ -139,7 +130,7 @@ module.exports = class Application {
 				return Promise
 					.map(groupNames, groupName => {
 						// get an array of membership lists
-						return isMembersOfGroup(uids, groupName);
+						return groups.isMembersAsync(uids, groupName);
 					});
 			})
 			.then(membershipLists => {
@@ -189,9 +180,9 @@ module.exports = class Application {
 
 	getVotes() {
 		return Promise.join(
-			getSortedSetRevRangeWithScores(rKey + this.tid + ':votes' + ':positive', 0, -1),
-			getSortedSetRevRangeWithScores(rKey + this.tid + ':votes' + ':negative', 0, -1),
-			getSortedSetRevRangeWithScores(rKey + this.tid + ':votes' + ':jellyfish', 0, -1),
+			db.getSortedSetRevRangeWithScoresAsync(rKey + this.tid + ':votes' + ':positive', 0, -1),
+			db.getSortedSetRevRangeWithScoresAsync(rKey + this.tid + ':votes' + ':negative', 0, -1),
+			db.getSortedSetRevRangeWithScoresAsync(rKey + this.tid + ':votes' + ':jellyfish', 0, -1),
 			(positive, negative, jellyfish) => {
 				return {
 					positive,
@@ -209,20 +200,46 @@ module.exports = class Application {
 				return Promise.map(Object.keys(votesSummary), typeKey => {
 					// typeKey: pos, neg, jell
 					return Promise.map(votesSummary[typeKey], voter => {
-						let uid = voter.value;
-						// voter = {value: '1' //uid, score: '1452982342' //time}
-						return Promise.join(
-							user.getUserFieldsAsync(uid, ['username', 'userslug']),
-							groups.isMemberOfGroupsAsync(uid, config.groupNames),
-							(username, membership) => {
-								voter.username = username;
-								voter.group = config.groupNames[membership.lastIndexOf(true)];
-								return groups.getGroupFieldsAsync(voter.group, ['labelColor'])
-									.then(data => voter.labelColor = data.labelColor)
-									.thenReturn(voter);
+							let uid = voter.value;
+							// voter = {value: '1' //uid, score: '1452982342' //time}
+							return Promise.join(
+								user.getUserFieldsAsync(uid, ['username', 'userslug']),
+								groups.isMemberOfGroupsAsync(uid, config.groupNames),
+								(user, membership) => {
+									voter.username = user.username;
+									voter.userslug = user.userslug;
+									voter.group = config.groupNames[membership.lastIndexOf(true)];
+									return groups.getGroupFieldsAsync(voter.group, ['labelColor'])
+										.then(data => voter.labelColor = data.labelColor)
+										.thenReturn(voter);
+								}
+							);
+						})
+						.then(voters => {
+							let leader = /лидер/gi,
+								general = /генерал/gi,
+								officer = /офицер/gi,
+								recruiter = /рекрутер/gi,
+								knight = /рыцар/gi,
+								friend = /соратник/gi,
+								guest = 'Горожанин';
+
+							function getWeight(name) {
+								if (!name) return 0;
+								if (name.match(leader)) return 100;
+								if (name.match(general)) return 75;
+								if (name.match(officer)) return 60;
+								if (name.match(recruiter)) return 55;
+								if (name.match(knight)) return 50;
+								if (name.match(friend)) return 45;
+								if (name.match(guest)) return 0;
+								return 0;
 							}
-						);
-					});
+
+							return _.orderBy(voters, voter => {
+								return getWeight(voter.group);
+							}, ['desc']);
+						})
 				});
 			})
 			.spread((positive, negative, jellyfish) => {
@@ -231,16 +248,14 @@ module.exports = class Application {
 					negative,
 					jellyfish
 				};
-			})
-			.then(console.log);
-		// User.getUsernamesByUids = function(uids, callback) {
+			});
 	}
 
 	votePositive(time, uid) {
 		return Promise.join(
-			sortedSetAdd(rKey + this.tid + ':votes' + ':positive', time, uid),
-			sortedSetRemove(rKey + this.tid + ':votes' + ':negative', uid),
-			sortedSetRemove(rKey + this.tid + ':votes' + ':jellyfish', uid),
+			db.sortedSetAddAsync(rKey + this.tid + ':votes' + ':positive', time, uid),
+			db.sortedSetRemoveAsync(rKey + this.tid + ':votes' + ':negative', uid),
+			db.sortedSetRemoveAsync(rKey + this.tid + ':votes' + ':jellyfish', uid),
 			this.calculateVotesSummary(),
 			(a, b, c, votesSummary) => {
 				return votesSummary;
@@ -250,9 +265,9 @@ module.exports = class Application {
 
 	voteNegative(time, uid) {
 		return Promise.join(
-			sortedSetRemove(rKey + this.tid + ':votes' + ':positive', uid),
-			sortedSetAdd(rKey + this.tid + ':votes' + ':negative', time, uid),
-			sortedSetRemove(rKey + this.tid + ':votes' + ':jellyfish', uid),
+			db.sortedSetRemoveAsync(rKey + this.tid + ':votes' + ':positive', uid),
+			db.sortedSetAddAsync(rKey + this.tid + ':votes' + ':negative', time, uid),
+			db.sortedSetRemoveAsync(rKey + this.tid + ':votes' + ':jellyfish', uid),
 			this.calculateVotesSummary(),
 			(a, b, c, votesSummary) => {
 				return votesSummary;
@@ -262,9 +277,9 @@ module.exports = class Application {
 
 	voteJellyfish(time, uid) {
 		return Promise.join(
-			sortedSetRemove(rKey + this.tid + ':votes' + ':positive', uid),
-			sortedSetRemove(rKey + this.tid + ':votes' + ':negative', uid),
-			sortedSetAdd(rKey + this.tid + ':votes' + ':jellyfish', time, uid),
+			db.sortedSetRemoveAsync(rKey + this.tid + ':votes' + ':positive', uid),
+			db.sortedSetRemoveAsync(rKey + this.tid + ':votes' + ':negative', uid),
+			db.sortedSetAddAsync(rKey + this.tid + ':votes' + ':jellyfish', time, uid),
 			this.calculateVotesSummary(),
 			(a, b, c, votesSummary) => {
 				return votesSummary;
@@ -279,12 +294,12 @@ module.exports = class Application {
 		this.status.rejected = 0;
 
 		return Promise.join(
-			sortedSetAdd(rKey + 'pending', time, this.tid),
-			sortedSetRemove(rKey + 'resolved', this.tid),
-			sortedSetRemove(rKey + 'approved', this.tid),
-			sortedSetRemove(rKey + 'rejected', this.tid),
+			db.sortedSetAddAsync(rKey + 'pending', time, this.tid),
+			db.sortedSetRemoveAsync(rKey + 'resolved', this.tid),
+			db.sortedSetRemoveAsync(rKey + 'approved', this.tid),
+			db.sortedSetRemoveAsync(rKey + 'rejected', this.tid),
 			db.setObjectAsync(rKey + this.tid + ':status', this.status),
-			unlockTopic(this.tid, 1),
+			topics.tools.unlockAsync(this.tid, 1),
 			this.setResolver(0)
 		);
 	}
@@ -296,12 +311,12 @@ module.exports = class Application {
 		this.status.rejected = 0;
 
 		return Promise.join(
-			sortedSetRemove(rKey + 'pending', this.tid),
-			sortedSetAdd(rKey + 'resolved', time, this.tid),
-			sortedSetRemove(rKey + 'approved', this.tid),
-			sortedSetRemove(rKey + 'rejected', this.tid),
+			db.sortedSetRemoveAsync(rKey + 'pending', this.tid),
+			db.sortedSetAddAsync(rKey + 'resolved', time, this.tid),
+			db.sortedSetRemoveAsync(rKey + 'approved', this.tid),
+			db.sortedSetRemoveAsync(rKey + 'rejected', this.tid),
 			db.setObjectAsync(rKey + this.tid + ':status', this.status),
-			lockTopic(this.tid, uid),
+			topics.tools.lockAsync(this.tid, uid),
 			this.setResolver(uid)
 		);
 	}
@@ -313,12 +328,12 @@ module.exports = class Application {
 		this.status.rejected = 0;
 
 		return Promise.join(
-			sortedSetRemove(rKey + 'pending', this.tid),
-			sortedSetAdd(rKey + 'resolved', time, this.tid),
-			sortedSetAdd(rKey + 'approved', time, this.tid),
-			sortedSetRemove(rKey + 'rejected', this.tid),
+			db.sortedSetRemoveAsync(rKey + 'pending', this.tid),
+			db.sortedSetAddAsync(rKey + 'resolved', time, this.tid),
+			db.sortedSetAddAsync(rKey + 'approved', time, this.tid),
+			db.sortedSetRemoveAsync(rKey + 'rejected', this.tid),
 			db.setObjectAsync(rKey + this.tid + ':status', this.status),
-			lockTopic(this.tid, uid),
+			topics.tools.lockAsync(this.tid, uid),
 			this.setResolver(uid)
 		);
 	}
@@ -330,12 +345,12 @@ module.exports = class Application {
 		this.status.rejected = time;
 
 		return Promise.join(
-			sortedSetRemove(rKey + 'pending', this.tid),
-			sortedSetAdd(rKey + 'resolved', time, this.tid),
-			sortedSetRemove(rKey + 'approved', this.tid),
-			sortedSetAdd(rKey + 'rejected', time, this.tid),
+			db.sortedSetRemoveAsync(rKey + 'pending', this.tid),
+			db.sortedSetAddAsync(rKey + 'resolved', time, this.tid),
+			db.sortedSetRemoveAsync(rKey + 'approved', this.tid),
+			db.sortedSetAddAsync(rKey + 'rejected', time, this.tid),
 			db.setObjectAsync(rKey + this.tid + ':status', this.status),
-			lockTopic(this.tid, uid),
+			topics.tools.lockAsync(this.tid, uid),
 			this.setResolver(uid)
 		);
 	}
@@ -348,7 +363,7 @@ module.exports = class Application {
 			memberOf = {},
 			resolver = {};
 
-		return isMemberOfGroups(uid, groupNames)
+		return groups.isMemberOfGroupsAsync(uid, groupNames)
 			.then(membershipList => {
 				// find out users' groups
 				return _.each(membershipList, (isMember, groupI) => {
@@ -356,7 +371,7 @@ module.exports = class Application {
 				});
 			})
 			.then(() => {
-				return getUserFields(uid, ['username', 'userslug'])
+				return user.getUserFieldsAsync(uid, ['username', 'userslug'])
 					.then(userFields => {
 						resolver.username = userFields.username;
 						resolver.userslug = userFields.userslug;
