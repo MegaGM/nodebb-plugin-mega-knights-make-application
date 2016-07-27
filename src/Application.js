@@ -84,13 +84,13 @@ module.exports = class Application {
 			});
 	}
 
-	getSummary() {
+	getSummary(callerUID) {
 		let summary = {};
 
 		return Promise.join(
 			db.getObjectAsync(rKey + this.tid + ':status'),
 			db.getObjectAsync(rKey + this.tid + ':summary'),
-			this.getVoters(),
+			this.getVoters(callerUID),
 			(status, votesSummary, voters) => {
 				summary.status = typecastStatus(status);
 				summary.votes = votesSummary;
@@ -193,7 +193,7 @@ module.exports = class Application {
 		);
 	}
 
-	getVoters() {
+	getVoters(callerUID) {
 		return this.getVotes()
 			// { pos: [{value: '1' //uid, score: '1452982342' //time}], neg: ..., jell: ... }
 			.then(votesSummary => {
@@ -248,7 +248,17 @@ module.exports = class Application {
 					negative,
 					jellyfish
 				};
-			});
+			})
+			.then(voters => {
+				// check if it's okay to show to user the voters
+				return groups.isMemberOfGroupsAsync(callerUID, config.groupNames)
+					.then(membership => {
+						if (membership.lastIndexOf(true) > 0)
+							return voters;
+						else
+							return null;
+					});
+			})
 	}
 
 	votePositive(time, uid) {

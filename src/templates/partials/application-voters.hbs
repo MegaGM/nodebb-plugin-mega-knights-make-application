@@ -1,15 +1,26 @@
-<div class="positive">За:
-	{{#each voters.positive}}
-		<a href="/user/{{userslug}}" {{#if labelColor}} style="color: {{labelColor}}" {{/if}}>{{username}}{{#unless @last}},{{/unless}}</a>
-	{{/each}}
-</div>
-<div class="jellyfish">Медузы:
-	{{#each voters.jellyfish}}
-		<a href="/user/{{userslug}}" {{#if labelColor}} style="color: {{labelColor}}" {{/if}}>{{username}}{{#unless @last}},{{/unless}}</a>
-	{{/each}}
-</div>
-<div class="negative">Против:
-	{{#each voters.negative}}
-		<a href="/user/{{userslug}}" {{#if labelColor}} style="color: {{labelColor}}" {{/if}}>{{username}}{{#unless @last}},{{/unless}}</a>
-	{{/each}}
-</div>
+{{#if voters}}
+	<div class="positive">За:
+		{{#unless voters.positive}}
+			пока нет
+		{{/unless}}
+		{{#each voters.positive}}
+			<a href="/user/{{userslug}}" {{#if labelColor}} style="color: {{labelColor}}" {{/if}}>{{username}}{{#unless @last}},{{/unless}}</a>
+		{{/each}}
+	</div>
+	<div class="jellyfish">Медузы:
+		{{#unless voters.jellyfish}}
+			пока нет
+		{{/unless}}
+		{{#each voters.jellyfish}}
+			<a href="/user/{{userslug}}" {{#if labelColor}} style="color: {{labelColor}}" {{/if}}>{{username}}{{#unless @last}},{{/unless}}</a>
+		{{/each}}
+	</div>
+	<div class="negative">Против:
+		{{#unless voters.negative}}
+			пока нет
+		{{/unless}}
+		{{#each voters.negative}}
+			<a href="/user/{{userslug}}" {{#if labelColor}} style="color: {{labelColor}}" {{/if}}>{{username}}{{#unless @last}},{{/unless}}</a>
+		{{/each}}
+	</div>
+{{/if}}

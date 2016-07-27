@@ -107,7 +107,6 @@
 	}
 
 	function processSummary(summary) {
-		console.log('summary: ', summary);
 		// compute progress bars' width
 		var minWidth = 5; // percents
 		var
@@ -158,7 +157,6 @@
 
 		// re-render status
 		require(['handlebars', 'knights-make-application/templates'], function (Handlebars) {
-			console.log('summary: ', summary);
 			var status = Handlebars.partials['application-status'](summary);
 			var voters = Handlebars.partials['application-voters'](summary);
 			$('.application-status').html(status);

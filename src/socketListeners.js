@@ -171,7 +171,8 @@ socketListeners.vote = (socket, data, callback) => {
 		return callback(true, 'invalid tid');
 
 	// check Capitalized data.type
-	let whitelist = ['Positive', 'Negative', 'Jellyfish'];
+	// let whitelist = ['Positive', 'Negative', 'Jellyfish'];
+	let whitelist = ['Positive', 'Negative'];
 	type = ('string' === typeof data.type) ?
 		type.charAt(0).toUpperCase() + type.slice(1) : false;
 	if (-1 === whitelist.indexOf(type))
@@ -230,7 +231,7 @@ socketListeners.getSummary = (socket, data, callback) => {
 	checkCid(data.tid)
 		.then(() => {
 			a = new Application(data.tid);
-			return a.getSummary();
+			return a.getSummary(socket.uid);
 		})
 		.catch(catchBreak) // catch bad data.tid
 		.then(summary => {
