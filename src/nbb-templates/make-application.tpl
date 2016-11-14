@@ -35,7 +35,6 @@
 			  		</p>
 					<br>
 					<h4 class="header"> Получи легендарный клан-тег Knights, годами прославляемый лучшими игроками коммьюнити!</h4>
-					<br>
 				</div>
 				<div class="apply">
 					<button class="btn btn-info accept-instruction-btn">Продолжить</button>
@@ -51,7 +50,7 @@
 					<button class="btn btn-info accept-statute-btn" disabled="disabled">Продолжить</button>
 					<div class="checkbox-inline">
 						<label>
-							<input type="checkbox" class="accept-statute-checkbox"> Я даю своё слово блюсти Кодекс Рыцарей
+							<input type="checkbox" class="accept-statute-checkbox"> Я даю своё слово чтить Кодекс Рыцарей
 						</label>
 					</div>
 				</div>
