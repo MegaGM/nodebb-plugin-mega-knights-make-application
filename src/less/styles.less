@@ -6,28 +6,28 @@
 
 .no-select {
 	-webkit-touch-callout: none;
-	-webkit-user-select  : none;
-	-khtml-user-select   : none;
-	-moz-user-select     : none;
-	-ms-user-select      : none;
-	user-select          : none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
 .row.no-gutters {
 	margin-right: 0;
-	margin-left : 0;
+	margin-left: 0;
 }
 
 .row.no-gutters > [class*=" col-"],
 .row.no-gutters > [class^="col-"] {
 	padding-right: 0;
-	padding-left : 0;
+	padding-left: 0;
 }
 
 .make-application-container {
 	padding: 5px 0;
-	border : 1px solid #dedede;
-	height : 100%;
+	border: 1px solid #dedede;
+	height: 100%;
 }
 
 .make-application-layout {
@@ -43,7 +43,10 @@
 
 	.statute {
 		background-color: #fff;
-		padding         : 10px 30px;
+		padding: 10px 30px;
+		@media (max-width: @screen-xs-max) {
+			padding: 10px;
+		}
 	}
 }
 
@@ -51,9 +54,12 @@
 .statute-layout,
 .welcome-message-layout {
 	padding: 35px;
+	@media (max-width: @screen-xs-max) {
+		padding: 10px;
+	}
 
 	.header {
-		margin-top   : 20px;
+		margin-top: 20px;
 		margin-bottom: 20px;
 	}
 
@@ -64,6 +70,9 @@
 	.apply,
 	.content {
 		padding: 15px;
+		@media (max-width: @screen-xs-max) {
+			padding: 10px;
+		}
 
 		.checkbox-inline {
 			margin-left: 15px;
@@ -76,7 +85,7 @@
 }
 
 .row.no-gutters select {
-	padding-left : 10px;
+	padding-left: 10px;
 	padding-right: 10px;
 }
 
